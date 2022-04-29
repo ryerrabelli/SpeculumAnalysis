@@ -1,0 +1,13 @@
+graft tests
+graft examples
+graft docs
+graft src
+
+exclude data/*
+exclude data/NBME/*
+exclude data/PixorizeImages/*
+exclude data/Sketchy/*
+exclude data/UW/*
+exclude
+prune data
+prune .git
