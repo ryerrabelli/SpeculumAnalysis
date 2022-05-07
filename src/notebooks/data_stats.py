@@ -1,0 +1,648 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# # Setup
+
+# ## Pip install
+
+# In[1]:
+
+
+# Don't forget to restart runtime after installing
+
+get_ipython().run_line_magic('pip', 'install -U kaleido  --quiet # for saving the still figures')
+get_ipython().run_line_magic('pip', 'install poppler-utils   # for exporting to .eps extension')
+get_ipython().run_line_magic('pip', 'install plotly==5.7.0.    # need 5.7.0, not 5.5, so I can use ticklabelstep argument')
+# %pip freeze
+# %pip freeze | grep matplotlib  # get version
+
+
+# ## Base imports
+# 
+
+# In[3]:
+
+
+import os
+import sys
+print(sys.version)
+import json
+import numpy as np
+import pandas as pd
+import scipy
+import scipy.stats
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+
+import skimage
+import skimage.io
+import requests
+
+import IPython.display
+import matplotlib
+import matplotlib.pyplot as plt
+import plotly
+import plotly.express as px
+
+
+# In[ ]:
+
+
+
+notebook_filename = requests.get("http://172.28.0.2:9000/api/sessions").json()[0]["name"]
+
+# Avoids scroll-in-the-scroll in the entire Notebook
+def resize_colab_cell():
+  display(IPython.display.Javascript('google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})'))
+get_ipython().events.register('pre_run_cell', resize_colab_cell)
+
+
+#@markdown ### func `def get_path_to_save(...):`
+def get_path_to_save(plot_props:dict=None, file_prefix="", save_filename:str=None, save_in_subfolder:str=None, extension="jpg", create_folder_if_necessary=True):
+    """
+    Code created myself (Rahul Yerrabelli)
+    """
+    replace_characters = {
+        "$": "",
+        "\\frac":"",
+        "\\mathrm":"",
+        "\\left(":"(",
+        "\\right)":")",
+        "\\left[":"[",
+        "\\right]":"]",
+        "\\": "",
+        "/":"-",
+        "{": "(",
+        "}": ")",
+        "<":"",
+        ">":"",
+        "?":"",
+        "_":"",
+        "^":"",
+        "*":"",
+        "!":"",
+        ":":"-",
+        "|":"-",
+        ".":"_",
+    }
+
+    # define save_filename based on plot_props
+    if save_filename is None:
+        save_filename = "unnamed"
+
+    #save_path = f"../outputs/{notebook_filename.split('.',1)[0]}"
+    save_path = [
+                 "outputs",
+                f"{notebook_filename.split('.',1)[0]}",
+                ]
+    if save_in_subfolder is not None:
+        if isinstance(save_in_subfolder, (list, tuple, set, np.ndarray) ):
+            save_path.append(**save_in_subfolder)
+        else:  # should be a string then
+            save_path.append(save_in_subfolder)
+    save_path = os.path.join(*save_path)
+
+    if not os.path.exists(save_path) and create_folder_if_necessary:
+        os.makedirs(save_path)
+    return os.path.join(save_path, file_prefix+save_filename+"."+extension)
+    #plt.savefig(os.path.join(save_path, save_filename+"."+extension))
+
+
+# In[5]:
+
+
+#@title ## Mount google drive and import my code
+
+mountpoint_folder_name = "drive"  # can be anything, doesn't have to be "drive"
+project_path_within_drive = "PythonProjects/SpeculumAnalysis" #@param {type:"string"}
+#project_path_within_drive = "UIUC ECs/Rahul_Ashkhan_Projects/SpeculumProjects_Shared/Analysis" #@param {type:"string"}
+project_path_full = os.path.join("/content/",mountpoint_folder_name,
+                        "MyDrive",project_path_within_drive)
+
+get_ipython().run_line_magic('cd', '{project_path_full}')
+
+
+# In[6]:
+
+
+
+try:
+    import google.colab.drive
+    import os, sys
+    # Need to move out of google drive directory if going to remount
+    get_ipython().run_line_magic('cd', '')
+    # drive.mount documentation can be accessed via: drive.mount?
+    #Signature: drive.mount(mountpoint, force_remount=False, timeout_ms=120000, use_metadata_server=False)
+    google.colab.drive.mount(os.path.join("/content/",mountpoint_folder_name), force_remount=True)  # mounts to a folder called mountpoint_folder_name
+
+    if project_path_full not in sys.path:
+        pass
+        #sys.path.insert(0,project_path_full)
+    get_ipython().run_line_magic('cd', '{project_path_full}')
+    
+except ModuleNotFoundError:  # in case not run in Google colab
+    import traceback
+    traceback.print_exc()
+
+
+# # Skip ahead from loaded code
+
+# In[104]:
+
+
+speculum_df_raw = pd.read_pickle("data/02_intermediate/speculum_df_raw"+".pkl")
+speculum_df_notfailed = pd.read_pickle("data/02_intermediate/speculum_df_notfailed"+".pkl")
+
+labels_df = pd.read_csv("data/02_intermediate/labels_df.csv", index_col=0)
+#with open("data/02_intermediate/label_from_id_dict"+".json", "r") as infile:
+#    label_from_id_dict = json.load(infile)
+    
+df_long = pd.read_pickle(  "data/03_processed/combined_df_long.pkl")
+df_wide = pd.read_pickle(  "data/03_processed/combined_df_wide.pkl")
+df_wide_flat = pd.read_pickle(  "data/03_processed/combined_df_wide_flat.pkl")
+
+df_agg_long = pd.read_pickle("data/04_aggregated/combined_df_agg_long.pkl")
+df_agg_long_flat = pd.read_pickle("data/04_aggregated/combined_df_agg_long_flat.pkl")
+
+df_multiindex = pd.read_pickle("data/03_processed/combined_df_multiindex"+".pkl")
+
+
+# # Set up for displaying
+
+# ## Setup dicts and helper functions
+
+# In[ ]:
+
+
+category_orders={"Size": ["S", "M", "L","Unspecified","None"],
+                 "Material":["Nitrile","Vinyl","Trojan", "Lifestyle", "Durex", "Skyn","None"],
+                 "Material Type":["Glove","Condom","None"],
+                 "Method":["Middle","Two","Palm","Middle finger","Two fingers","Palm","Precut","None"],
+                 "Speculum Type":["White","Green"]}
+labels = {
+    "Trial":"Trial #",
+    "wd_rel":"Relative Obstruction",
+    "wd_rel.mean":"Mean Relative Obstruction (S.E.)", 
+    "mmHg":"Pressure (mmHg)", 
+    "Material":"Material", "Material Type":"Material Type"
+    }
+
+
+def criteria_to_str(criteria:dict) -> str:
+    return ", ".join([f"{labels.get(key) or key}={val}" for key,val in criteria.items()])
+
+
+def filter_by_criteria(criteria:dict, starting_df:pd.DataFrame) -> pd.DataFrame:
+    #df_sampled = df_agg_long_flat.loc[ np.all([df_agg_long[arg]==val for arg, val in criteria.items()], axis=0) ]
+    #df_sampled = df_agg_long_flat.loc[ np.all([ (type(val)!=list and df_agg_long[arg]==val ) or np.in1d(df_agg_long[arg],val)  for arg, val in criteria.items()], axis=0) ]
+    #starting_df.loc[ np.all([ (type(val)!=list and starting_df[arg]==val ) or np.in1d(starting_df[arg],val)  for arg, val in criteria.items()], axis=0) ]
+    conditions = []
+    for arg, val in criteria.items():
+        if hasattr(val,"__iter__") and not isinstance(val,str):
+            conditions.append( np.in1d(starting_df[arg],val) )
+        else:
+            conditions.append( starting_df[arg]==val )
+    return starting_df.loc[ np.all(conditions, axis=0) ]
+
+
+# ## Setup  plotly
+
+# In[ ]:
+
+
+default_plotly_save_scale = 4
+def save_plotly_figure(fig, file_name:str, animated=False, scale=None, save_in_subfolder:str=None, extensions=None):
+    """
+    - for saving plotly.express figures only - not for matplotlib
+    - fig is of type plotly.graph_objs._figure.Figure,
+    - Requires kaleido installation for the static (non-animated) images
+    """    
+    if scale is None:
+        scale = default_plotly_save_scale
+    if extensions is None:
+        extensions = ["html"]
+        if not animated:
+            # options = ['png', 'jpg', 'jpeg', 'webp', 'svg', 'pdf', 'eps', 'json']
+            extensions += ["eps","png","pdf"]
+
+    for extension in extensions:
+        try:
+            if extension in ["htm","html"]:
+                    fig.write_html( get_path_to_save(save_filename=file_name, save_in_subfolder=save_in_subfolder, extension=extension), 
+                        full_html=False,
+                        include_plotlyjs="directory" )
+            else:
+                fig.write_image(get_path_to_save(save_filename=file_name, save_in_subfolder=save_in_subfolder, extension=extension), scale=scale)
+        except ValueError as exc:
+            import traceback
+            #traceback.print_exception()
+
+#col_options = {col_name:pd.unique(df_long[col_name]).tolist() for col_name in consistent_cols}
+#display(col_options)
+
+
+# # Stats
+
+# ## Create SEM tables
+
+# In[ ]:
+
+
+
+#df_wide.groupby(["Size","Material","Method"]).agg([np.mean, scipy.stats.sem, np.std, np.min, np.median, np.max, np.count_nonzero], ddof=1)
+df_agg_wide = df_wide.groupby(["Speculum Type","Material Type","Material","Size","Method","Spec Ang","Spec Ht",]).agg([np.count_nonzero, np.mean, scipy.stats.sem], ddof=1)
+df_agg_wide = df_agg_wide.rename(columns={"count_nonzero":"N nonzero"}).sort_index(ascending=False)
+
+df_agg_wide_brief = df_wide.groupby(["Material Type","Material","Size","Method","Spec Ang"]).agg([np.mean, scipy.stats.sem], ddof=1)
+df_agg_wide_brief = df_agg_wide_brief.drop(columns=["ht_rel"],level=0).drop(columns=[0],level=1).sort_index(ascending=False, level=[0], sort_remaining=False)
+df_agg_wide_brief = df_agg_wide_brief.rename(columns={"Vertical Height":"Opening Height (cm)","wd_rel":"Percent of View Width Obstructed", "sem":"SEM", "mean":"Mean", "Spec Ang":"Clicks", "Material Type":""})
+df_agg_wide_brief = df_agg_wide_brief.rename(index={"Unspecified":"","None":""},level=2).rename(index={"Precut":"","None":"","Two":"Two fingers","Middle":"Middle finger"},level=3)
+
+df_agg_wide_brief.columns = df_agg_wide_brief.columns.set_levels([ (f"At {name}mmHg" if type(name)==int else name) for name in df_agg_wide_brief.columns.levels[1]], level=1)
+df_agg_wide_brief.columns.names = [None]*len(df_agg_wide_brief.columns.names)
+df_agg_wide_brief.index = df_agg_wide_brief.index.rename({"Spec Ang":"Clicks","Material Type":"Type"})
+df_agg_wide_brief = df_agg_wide_brief[df_agg_wide_brief.columns.levels[0][::-1]]   # [::-1] reverses the order
+
+
+# Save
+df_agg_wide.to_excel("data/04_aggregated/combined_df_agg_wide.xlsx")
+df_agg_wide.to_pickle("data/04_aggregated/combined_df_agg_wide.pkl")
+
+# Save table
+styled = df_agg_wide_brief.style
+styled = styled.format("{:.2f}",    na_rep="---",  subset=pd.IndexSlice[:,pd.IndexSlice[:,:,"Mean"]])
+styled = styled.format("±{:>7.3f}", na_rep="---",  subset=pd.IndexSlice[:,pd.IndexSlice[:,:,"SEM"]])
+styled = styled.format("{:.1%}",    na_rep="---",  subset=pd.IndexSlice[:,pd.IndexSlice["Percent of View Width Obstructed",:,"Mean"]])
+styled = styled.format("±{:>6.2%}", na_rep="---",  subset=pd.IndexSlice[:,pd.IndexSlice["Percent of View Width Obstructed",:,"SEM"]])
+"""styled.set_table_styles({
+    ('Opening Height (cm)',"", 'Mean'): [{'selector': 'th', 'props': 'border-left: 1px solid white'},
+                               {'selector': 'td', 'props': 'border-left: 1px solid #000066'}]
+}, overwrite=False, axis=0)
+"""
+styled = styled.set_properties(**{"text-align":"right","border-left": "1px solid black","border-bottom":"1px solid black",}, subset=pd.IndexSlice[:,pd.IndexSlice[:,:,"Mean"]])
+styled = styled.set_properties(**{"text-align":"left","border-right":"1px solid black","border-bottom":"1px solid black",},  subset=pd.IndexSlice[:,pd.IndexSlice[:,:,"SEM"]])
+styled = styled.set_properties(**{"border-left":"2px double black"},  subset=pd.IndexSlice[:,pd.IndexSlice["Opening Height (cm)",:,"Mean"]])
+styled.set_table_styles([dict(selector='th', props=[('text-align', 'center')])])
+
+#styled = styled.set_caption(f"Varying {varying} with " + criteria_to_str(criteria)).set_table_styles(style_props)
+#df_agg_wide_brief.round(3).to_excel("outputs/tables/mean_and_sem_brief.xlsx")
+
+writer = pd.ExcelWriter("outputs/tables/mean_and_sem_brief.xlsx", engine='xlsxwriter')
+styled.to_excel(writer,sheet_name="BriefStats")
+workbook  = writer.book
+worksheet = writer.sheets["BriefStats"]
+# Add some cell formats.
+format1 = workbook.add_format({'num_format': '#,##0.00'})
+format2 = workbook.add_format({'num_format': '0%'})
+
+# Set the format but not the column width.
+worksheet.set_column(2, 2, None, format2)
+writer.save()
+
+
+get_ipython().run_line_magic('ls', 'outputs/tables')
+
+df_agg_wide_brief.to_excel("data/04_aggregated/combined_df_agg_wide_brief.xlsx", engine='openpyxl')
+df_agg_wide_brief.to_pickle("data/04_aggregated/combined_df_agg_wide_brief.pkl")
+
+display(styled)
+
+
+# ## Test-Retest Reliability, ICC
+
+# In[57]:
+
+
+#df_long_wd_rel.index.levels[-1]
+#df_long_wd_rel = df_long_wd_rel.droplevel("mmHg")
+#df_long_wd_rel
+df_long_wd_rel = df_long.pivot(index=
+                        ["Speculum Type","Material Type","Material","Size","Method","Spec Ang","Spec Ht","mmHg"], 
+                        columns="Trial", values=["wd_rel"]) #"ht_rel" #.reset_index("Vertical Height")
+df_long_wd_rel.drop(0, level=-1)
+
+
+# In[60]:
+
+
+#df_wide 
+#df_wide
+df_long_wd_rel = df_long.pivot(index=
+                        ["Speculum Type","Material Type","Material","Size","Method","Spec Ang","Spec Ht","mmHg"], 
+                        columns="Trial", values=["wd_rel"]) #"ht_rel" #.reset_index("Vertical Height")
+df_long_wd_rel = df_long_wd_rel.drop(0, level=-1) # drop 0mmHg because that will always be 0% by definition
+
+df_long_vh = df_long.pivot(index=
+                        ["Speculum Type","Material Type","Material","Size","Method","Spec Ang","Spec Ht","mmHg"], 
+                        columns="Trial", values=["Vertical Height"]) #"ht_rel" #.reset_index("Vertical Height")
+df_long_vh = df_long_vh.drop([40,80,120,160,200], level=-1) # drop 0mmHg because that will always be 0% by definition
+
+#df_long_wd_rel = df_long_wd_rel.dropna(how = 'any')
+#display( np.corrcoef( df_long_wd_rel[("wd_rel","1")], df_long_wd_rel[("wd_rel","2")] ) )
+#display( df_long_wd_rel[("wd_rel","1")].corr( df_long_wd_rel[("wd_rel","2")] ) )
+
+display( df_long_wd_rel.corr() )
+display( df_long_vh.corr() )
+
+
+# In[75]:
+
+
+# Package by Lily Eisner. Using v0.0.4. https://github.com/nimh-comppsych/data-reliability-stability/wiki/User-Guide
+# Math originally from: Heise, D. R. (1969). Separating reliability and stability in test-retest correlation. American Sociological Review, 34(1), 93–101. https://doi.org/10.2307/2092790
+# Other resources: (2015) https://stats.stackexchange.com/questions/152130/how-can-i-quantify-test-retest-reliability-with-three-waves-of-measurement
+get_ipython().run_line_magic('pip', 'install reliability-stability-calc==0.0.4')
+
+
+# In[74]:
+
+
+import reliability_stability
+
+# Pearson's correlation (test-retest reliability for 2 data points)
+display( reliability_stability.calc_correlation(df_long_wd_rel, ("wd_rel","1"), ("wd_rel","2")) )
+# test retest reliability for 3 datapoints
+display( reliability_stability.calc_reliability(df_long_wd_rel, ("wd_rel","1"), ("wd_rel","2"), ("wd_rel","3")) )
+
+
+# In[76]:
+
+
+get_ipython().run_line_magic('pip', 'install pingouin')
+
+
+# In[103]:
+
+
+df_long3 = df_long.copy()
+
+key_cols = ["Speculum Type","Spec Ang","Spec Ht","Size","Material","Material Type","Method"]
+#df_long3.drop_duplicates(subset=key_cols).reset_index().drop("index",axis=1).reset_index().rename({"index":"Set"},axis=1)
+set_info = df_long3[key_cols].drop_duplicates().reset_index().drop("index",axis=1).reset_index().rename({"index":"Set"},axis=1)
+with_set_info = set_info.merge(df_long3, how="outer",on=key_cols)
+
+
+# In[105]:
+
+
+import pingouin as pg
+
+icc = pg.intraclass_corr(data=df_long, targets='Set', raters='Trial', ratings='wd_rel')
+
+
+# ## ANOVA
+
+# ### ANOVA Table styling
+
+# In[ ]:
+
+
+#anova_tabless.loc[:,pd.IndexSlice[:,"PR(>F)"]] = anova_tabless.loc[:,pd.IndexSlice[:,"PR(>F)"]].applymap(lambda p: str(p)+''.join(['*' for alpha in [0.001,0.01,0.05] if p<=alpha]))
+def apply_anova_table_styling(styled, varying, criteria, anova_types:list=None):
+    style_props = [dict(selector="caption",props=[("text-align", "left"),
+                   ("font-size", "180%"), ("font-weight","bold"),
+                   ]),
+               dict(selector='th.col_heading.level0', props=[('font-size','120%;')]),
+               dict(selector='th.col_heading', props=[('text-align','center')]) 
+               ]
+    styled = styled.format(na_rep=" ", precision=4)
+    styled = styled.format("{:.0f}",  subset=pd.IndexSlice[:,pd.IndexSlice[:,"df"]])
+    styled = styled.applymap(lambda x: f"color: {'red' if x<=0.01 else ('orange' if x<=0.05 else 'black')}",subset=pd.IndexSlice[:,pd.IndexSlice[:,"PR(>F)"]])
+    styled = styled.set_caption(f"Varying {varying} with " + criteria_to_str(criteria)).set_table_styles(style_props)
+    if anova_types is not None:
+        styled = styled.applymap((lambda x: f"opacity: 0.5"),subset=pd.IndexSlice[[f"Type {ind} ANOVA" for ind in range(1,4) if ind not in anova_types],:])
+    return styled
+
+
+# ### Calculations
+
+# In[ ]:
+
+
+#criteria = [{"Material Type":"Glove","Material":"Nitrile", "mmHg":(ind*40)} for ind in range(6)]
+criteria = {"Material Type":"Glove","Material":"Nitrile"}
+varying = "Size"
+
+anova_tabless = {}
+for ind in range(6):
+    criteria_specific = criteria.copy()
+    criteria_specific["mmHg"] = ind*40
+    #criteria = criterias[ind]
+    df_sampled = filter_by_criteria(criteria_specific,df_long)
+    
+    # Ordinary Least Squares (OLS) model
+    model = smf.ols(f"wd_rel ~ C(Q('{varying}'))", data=df_sampled)
+    ols_result = model.fit()
+    # See article for ANOVA types: https://towardsdatascience.com/anovas-three-types-of-estimating-sums-of-squares-don-t-make-the-wrong-choice-91107c77a27a
+    # For type 1, the first argument will be assumed to be the most important
+    types = [1,2,3]
+    anova_tables = pd.concat(
+        [sm.stats.anova_lm(ols_result, typ=type) for type in types],
+        axis=1, keys=[f"Type {type} ANOVA" for type in types])
+    anova_tabless[f"{criteria_specific['Material Type']} at {criteria_specific['mmHg']}mmHg"] = anova_tables
+
+anova_tabless = pd.concat(anova_tabless,axis=0,keys=[f"{criteria['Material Type']} at {ind*40}mmHg" for ind in range(6)])
+
+styled = anova_tabless.style
+apply_anova_table_styling(styled, varying, criteria)
+styled = styled.applymap((lambda x: f"opacity: 0.5"),subset=pd.IndexSlice[:,[f"Type {ind} ANOVA" for ind in [2,3]]])
+display(styled)
+styled.to_excel(f"outputs/tables/ANOVA_{styled.caption}.xlsx")
+
+
+# In[ ]:
+
+
+criteria = {"Material Type":"Condom"}
+varying = "Material"
+
+#df_sampled = df_long.loc[ np.all([ (type(val)!=list and df_long[arg]==val ) or np.in1d(df_long[arg],val)  for arg, val in criteria.items()], axis=0) ]
+df_sampled = filter_by_criteria(criteria,df_long)
+df_sampled.loc[:,"mmHg"] = df_sampled["mmHg"].astype(np.int64)
+
+ys = [("wd","Width (wd)"),("wd_rel","Width % (wd_rel)")]
+anova_tabless = {}
+types = [1,2,3]
+for anova_type in types:
+    anova_tables = []
+    for ind, (y, y_name) in enumerate(ys):
+        # Ordinary Least Squares (OLS) model
+        model = smf.ols(f"{y} ~ mmHg + C(Q('{varying}'))", data=df_sampled)
+        ols_result = model.fit()
+        # See article for ANOVA types: https://towardsdatascience.com/anovas-three-types-of-estimating-sums-of-squares-don-t-make-the-wrong-choice-91107c77a27a
+        # For type 1, the first argument will be assumed to be the most important
+        
+        anova_tables.append( sm.stats.anova_lm(ols_result, typ=anova_type) )
+    anova_tabless[f"Type {anova_type} ANOVA"] = pd.concat(anova_tables, axis=1, keys = [y_name for y,y_name in ys]) 
+
+anova_tabless = pd.concat(anova_tabless.values(), axis=0, keys=anova_tabless.keys())
+
+styled = anova_tabless.style
+apply_anova_table_styling(styled, varying, criteria, anova_types=[1])
+display(styled)
+styled.to_excel(f"outputs/tables/ANOVA_{styled.caption}.xlsx")
+
+
+# In[ ]:
+
+
+criteria = {"Material Type":"Glove","Material":"Nitrile"}
+varying = "Size"
+
+df_sampled = filter_by_criteria(criteria,df_long)
+df_sampled.loc[:,"mmHg"] = df_sampled["mmHg"].astype(np.int64)
+
+ys = [("wd","Width (wd)"),("wd_rel","Width % (wd_rel)")]
+anova_tabless = {}
+types = [1,2,3]
+for anova_type in types:
+    anova_tables = []
+    for ind, (y, y_name) in enumerate(ys):
+        # Ordinary Least Squares (OLS) model
+        model = smf.ols(f"{y} ~ mmHg + C(Q('{varying}'))", data=df_sampled)
+        ols_result = model.fit()
+        # See article for ANOVA types: https://towardsdatascience.com/anovas-three-types-of-estimating-sums-of-squares-don-t-make-the-wrong-choice-91107c77a27a
+        # For type 1, the first argument will be assumed to be the most important
+        
+        anova_tables.append( sm.stats.anova_lm(ols_result, typ=anova_type) )
+    anova_tabless[f"Type {anova_type} ANOVA"] = pd.concat(anova_tables, axis=1, keys = [y_name for y,y_name in ys]) 
+
+anova_tabless = pd.concat(anova_tabless.values(), axis=0, keys=anova_tabless.keys())
+
+styled = anova_tabless.style
+apply_anova_table_styling(styled, varying, criteria, anova_types=[1])
+styled = styled.applymap((lambda x: f"opacity: 0.5"),subset=pd.IndexSlice[["Type 2 ANOVA", "Type 3 ANOVA"],:])
+display(styled)
+#styled.to_excel(f"outputs/tables/ANOVA_{styled.caption}.xlsx")
+
+
+# In[ ]:
+
+
+criteria = {"Material Type":["Glove"],"Material":["Nitrile"]}
+
+df_sampled = filter_by_criteria(criteria,df_long)
+
+# Ordinary Least Squares (OLS) model
+model = smf.ols("wd_rel ~ mmHg + C(Q('Size'))", data=df_sampled)
+ols_result = model.fit()
+# See article for ANOVA types: https://towardsdatascience.com/anovas-three-types-of-estimating-sums-of-squares-don-t-make-the-wrong-choice-91107c77a27a
+# For type 1, the first argument will be assumed to be the most important
+types = [1,2,3]
+anova_tables = pd.concat(
+    [sm.stats.anova_lm(ols_result, typ=type) for type in types],
+    axis=1, keys=[f"ANOVA Type {type}" for type in types])
+display(anova_tables)
+
+
+# ## Models
+
+# In[ ]:
+
+
+df_long.head()
+
+
+# In[ ]:
+
+
+df_long['Material Type']
+
+
+# In[ ]:
+
+
+criteria = {"mmHg":[40,80,120,160,200]}
+#varying = "Material"
+
+df_sampled = df_long.loc[ np.all([ (type(val)!=list and df_long[arg]==val ) or np.in1d(df_long[arg],val)  for arg, val in criteria.items()], axis=0) ]
+
+formula = "wd_rel ~ mmHg + C(Q('Material Type')) + C(Material) + C(Size)"
+model = smf.ols(formula = formula, data=df_sampled)
+ols_result = model.fit()
+
+
+fig, axs = plt.subplots(1,2, figsize=(6,2), dpi=100)
+_ = scipy.stats.probplot(ols_result.resid, plot=axs[0])
+#plt.figure()
+axs[1].scatter(ols_result.fittedvalues, ols_result.resid)
+axs[1].set_xlabel('Fitted value')
+axs[1].set_ylabel('Residual')
+fig.tight_layout()
+
+print(ols_result.summary())
+
+
+# In[ ]:
+
+
+df_long
+
+
+# In[ ]:
+
+
+gen_formula = "{y} ~ C(Q('Material Type')) + C(Material) + C(Size)"
+nrows=6
+fig, axes = plt.subplots(nrows,4, figsize=(12,2*nrows), dpi=100, sharex="col", sharey="all")
+for ind in range(nrows):
+    mmHg = 40*ind
+    criteria = {"mmHg":[mmHg]}
+    df_sampled = df_long.loc[ np.all([ (type(val)!=list and df_long[arg]==val ) or np.in1d(df_long[arg],val)  for arg, val in criteria.items()], axis=0) ]
+    
+    ys = [("wd","Width"),("wd_rel","Width %")]
+    for ind2, (y,y_name) in enumerate(ys):
+        #display(df_sampled.head())
+        formula = gen_formula.format(y=y)
+        model = smf.ols(formula = formula, data=df_sampled)
+        ols_result = model.fit()
+
+        _ = scipy.stats.probplot(ols_result.resid, plot=axes[ind,0+ind2*2])
+        if ind < nrows-1:
+            axes[ind,0+ind2*2].set_xlabel("")
+
+        #plt.figure()
+        axes[ind,1+ind2*2].scatter(ols_result.fittedvalues, ols_result.resid)
+        axes[ind,1+ind2*2].set_ylabel('Residual')
+        axes[ind,1+ind2*2].set_title(f"{y_name} at {mmHg}mmHg")
+
+axes[-1,1].set_xlabel('Fitted value')
+axes[-1,3].set_xlabel('Fitted value')
+
+for ind,ax in enumerate(axes.flat):
+    ax.grid(which="major", alpha=0.75)  # set major grid lines
+    ax.grid(which="minor", alpha=0.5, linestyle=":")  # set minor grid lines, but make them less visible
+    ax.xaxis.set_minor_locator(matplotlib.ticker.AutoMinorLocator())
+    ax.yaxis.set_minor_locator(matplotlib.ticker.AutoMinorLocator())
+
+dpi = fig.dpi
+title = f"Reliability of GLM with formula of \"{gen_formula}\""+ f", dpi={dpi}".replace("{","").replace("}","")
+fig.suptitle(title)
+fig.tight_layout(rect=[0,0,1,0.95] )  # rect=[left, bottom, right top]
+
+plt.savefig(get_path_to_save(save_filename=title), 
+            bbox_inches='tight')  # Include the bbox_inches='tight' is critical to ensure the saved images aren't cutoff while the colab images are normal
+
+
+# In[ ]:
+
+
+# Poisson regression code
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+
+formula = "Q('Vertical Height') ~ C(Material)"
+model = smf.glm(formula = formula, data=df_long, family=sm.families.Binomial())
+#model = smf.glm(formula = formula, data=df_wide_flat)
+result = model.fit()
+print(result.summary())
+
+
+# In[ ]:
+
+
+exog, endog = sm.add_constant(x), y
+mod = sm.GLM(endog, exog,
+             family=sm.families.Poisson(link=sm.families.links.log))
+res = mod.fit()
+

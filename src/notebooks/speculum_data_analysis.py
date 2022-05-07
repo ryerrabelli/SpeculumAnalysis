@@ -5,13 +5,14 @@
 
 # ## Pip install
 
-# In[2]:
+# In[ ]:
 
 
 # Don't forget to restart runtime after installing
 
 get_ipython().run_line_magic('pip', 'install "labelbox[data]" --quiet')
 get_ipython().run_line_magic('pip', 'install -U kaleido  --quiet # for saving the still figures')
+get_ipython().run_line_magic('pip', 'install poppler-utils   # for exporting to .eps extension')
 get_ipython().run_line_magic('pip', 'install plotly==5.7.0.    # need 5.7.0, not 5.5, so I can use ticklabelstep argument')
 # %pip freeze
 # %pip freeze | grep matplotlib  # get version
@@ -51,7 +52,7 @@ import plotly
 import plotly.express as px
 
 
-# In[4]:
+# In[ ]:
 
 
 
@@ -114,7 +115,7 @@ def get_path_to_save(plot_props:dict=None, file_prefix="", save_filename:str=Non
     #plt.savefig(os.path.join(save_path, save_filename+"."+extension))
 
 
-# In[5]:
+# In[ ]:
 
 
 #@title ## Mount google drive and import my code
@@ -128,7 +129,7 @@ project_path_full = os.path.join("/content/",mountpoint_folder_name,
 get_ipython().run_line_magic('cd', '{project_path_full}')
 
 
-# In[5]:
+# In[ ]:
 
 
 
@@ -151,251 +152,13 @@ except ModuleNotFoundError:  # in case not run in Google colab
     traceback.print_exc()
 
 
-# # Data
-
-# ## Read in the collected/labeled data
-
-# ### Labelbox
-
-# #### Option 1: Read from labelbox
-
-# ##### Set up labelbox connection
-# Works with LabelBox api (https://labelbox.com/), which is the tool I used to label all the distances on the images.
-
-# In[15]:
-
-
-# Add your labelbox api key and project
-# Labelbox API stored in separate file since it is specific for a labelbox 
-#account and shouldn't be committed to git. Contact the 
-# team (i.e. Rahul Yerrabelli) in order to access to the data on your own account.
-with open("auth/LABELBOX_API_KEY.json", "r") as infile:
-  json_data = json.load(infile)
-API_KEY = json_data["API_KEY"]
-del json_data   # delete sensitive info
-
-PROJECT_ID = "cl2cept1u4ees0zbx6uan5kwa"
-DATASET_ID_Glove = "cl2cerkwd5gtd0zcahfz98401"; DATASET_NAME_Glove = "SpeculumWithGlove"
-DATASET_ID_Condom = "cl2hu1u8z019a0z823yl5f8gr"; DATASET_NAME_Condom = "SpeculumWithCondom"
-
-client = labelbox.Client(api_key=API_KEY)
-del API_KEY   # delete sensitive info
-project = client.get_project(PROJECT_ID)
-dataset_glove = client.get_dataset(DATASET_ID_Glove)
-dataset_condom = client.get_dataset(DATASET_ID_Condom)
-# Alternative way to get dataset
-# dataset = next(client.get_datasets(where=(labelbox.Dataset.name == DATASET_NAME)))
-
-# Below code is from labelbox tutorial
-# Create a mapping for the colors
-hex_to_rgb = lambda hex_color: tuple(
-    int(hex_color[i + 1:i + 3], 16) for i in (0, 2, 4))
-colors = {
-    tool.name: hex_to_rgb(tool.color)
-    for tool in labelbox.OntologyBuilder.from_project(project).tools
-}
-
-
-# ##### Get dataframe now that labelbox is set up
-
-# In[42]:
-
-
-image_labels = project.label_generator()
-image_labels = image_labels.as_list()
-labels_df = pd.DataFrame([[
-                           label.data.external_id, 
-                           label.annotations[0].value.end.x - label.annotations[0].value.start.x, 
-                           label.annotations[0].value.end.y - label.annotations[0].value.start.y, 
-                           label.annotations[0].value.start.x, 
-                           label.annotations[0].value.start.y, 
-                           label.data.url, 
-                           label.uid
-                           ] 
-                          for label in image_labels],
-                         columns=["Filename","x","y", "xstart","ystart","url", "Label ID"])
-labels_df.to_csv("data/02_intermediate/labels_df"+".csv")
-labels_df.to_pickle("data/02_intermediate/labels_df"+".pkl")
-
-label_from_id_dict = {label.data.external_id: label for label in image_labels}
-#with open("data/02_intermediate/label_from_id_dict"+".json", "w") as outfile:
-#    json.dump(label_from_id_dict, outfile)   # Error: Object of type Label is not JSON serializable 
-
-
-# #### Option 2: Read from labelbox csv if already saved there from previous run
-
-# In[10]:
-
-
-labels_df = pd.read_csv("data/02_intermediate/labels_df.csv", index_col=0)
-#with open("data/02_intermediate/label_from_id_dict"+".json", "r") as infile:
-#    label_from_id_dict = json.load(infile)
-
-
-# ### Read trial data from saved excel sheet
-
-# In[11]:
-
-
-def handle_vertical_ht(x):
-    if x=="BROKE":
-        return 0
-    elif type(x)==str and x.lower() in ["n/a","na","nan"]:
-        return np.nan
-    else:
-        return float(x)
-
-# Made Trial a str because it is not really being used as a numeric variable - better for plotting as it becomes a discrete variable instead of continuous (i.e. for color legend)
-speculum_df_raw = pd.read_excel("data/01_raw/SpeculumTrialData.xlsx", index_col=0, sheet_name="AllTrials",
-                                dtype={"Order": np.int32, "Spec Ang": np.int32, "Spec Ht": np.int32, 
-                                       #"Vertical Height": np.float64, 
-                                       "Trial": str, "Filename": str, "Speculum Type": str},
-                                converters={"Vertical Height": handle_vertical_ht},
-                                )    
-speculum_df_notfailed = speculum_df_raw.dropna(axis="index", subset=["Filename"])   # Dropped the rows with failed trials
-
-speculum_df_notfailed.to_csv("data/02_intermediate/speculum_df_notfailed"+".csv")
-speculum_df_notfailed.to_pickle("data/02_intermediate/speculum_df_notfailed"+".pkl")
-
-
-# ## Data rearranging
-
-# ### Combine labelbox and excel sheet, calculate relative value
-
-# In[12]:
-
-
-df_long=pd.merge(left=speculum_df_notfailed, right=labels_df, on="Filename")
-
-glove_rows = df_long["Material Type"]=="Glove"
-# The glove images got rotated 90 degrees. To fix this and clarify the directions of the opening, renaming the columns from x,y to wd and ht.
-df_long.loc[ glove_rows,"wd"] = df_long.loc[ glove_rows].y
-df_long.loc[ glove_rows,"ht"] = df_long.loc[ glove_rows].x
-df_long.loc[ glove_rows,"wd_start"] = df_long.loc[ glove_rows].ystart
-df_long.loc[ glove_rows,"ht_start"] = df_long.loc[ glove_rows].xstart
-
-df_long.loc[~glove_rows,"wd"] = df_long.loc[~glove_rows].x
-df_long.loc[~glove_rows,"ht"] = df_long.loc[~glove_rows].y
-df_long.loc[~glove_rows,"wd_start"] = df_long.loc[~glove_rows].xstart
-df_long.loc[~glove_rows,"ht_start"] = df_long.loc[~glove_rows].ystart
-df_long = df_long.drop(columns=["x","y","xstart","ystart"])
-
-df_long.head()
-
-# Calculate relative value by dividing by the 0mmHg value
-base_mmHg = 0 # mmHg
-for ind in df_long["Order"].unique():
-    df_long.loc[df_long["Order"]==ind,"wd_rel"]  = 1- df_long.loc[df_long["Order"]==ind].wd / df_long.loc[ (df_long["Order"]==ind) & (df_long["mmHg"]==base_mmHg) ].wd.item()
-    df_long.loc[df_long["Order"]==ind,"ht_rel"]  = 1- df_long.loc[df_long["Order"]==ind].ht / df_long.loc[ (df_long["Order"]==ind) & (df_long["mmHg"]==base_mmHg) ].ht.item()
-#df_long
-
-
-# ### Get wide form
-
-# In[13]:
-
-
-df_wide = df_long.pivot(index=
-                        ["Order","Speculum Type","Size","Material","Material Type","Method","Spec Ang","Spec Ht","Trial","Vertical Height"], 
-                        columns="mmHg", values=["wd_rel","ht_rel"]).reset_index("Vertical Height")
-df_wide_flat = df_wide.copy()
-df_wide_flat.columns = [".".join([str(item) for item in col]).strip(".") for col in df_wide_flat.columns.values]
-
-
-# ### Order by set and the mmHg within that set (multiindex)
-
-# In[14]:
-
-
-df_multiindex = df_long.set_index(["Order","mmHg"])
-df_multiindex
-
-
-# ### Save processed dfs
-
-# In[15]:
-
-
-df_long.to_csv(  "data/03_processed/combined_df_long"+".csv")
-df_long.to_excel("data/03_processed/combined_df_long"+".xlsx")
-df_long.to_pickle("data/03_processed/combined_df_long"+".pkl")
-
-df_wide.to_csv(  "data/03_processed/combined_df_wide"+".csv")
-df_wide.to_excel("data/03_processed/combined_df_wide"+".xlsx")
-df_wide.to_pickle("data/03_processed/combined_df_wide"+".pkl")
-
-df_wide_flat.to_csv(  "data/03_processed/combined_df_wide_flat"+".csv")
-df_wide_flat.to_excel("data/03_processed/combined_df_wide_flat"+".xlsx")
-df_wide_flat.to_pickle("data/03_processed/combined_df_wide_flat"+".pkl")
-
-df_multiindex.to_excel("data/03_processed/combined_df_multiindex"+".xlsx")   # assuming a multiindex wouldn't save well to a csv file
-df_multiindex.to_pickle("data/03_processed/combined_df_multiindex"+".pkl")  
-
-
-# ## Get aggregate df across trials
-
-# In[16]:
-
-
-# Group by all the parameters that will be the same across different trials of the same object
-consistent_cols = ["Speculum Type", "Spec Ang", "Spec Ht", "Size", "Material", "Material Type", "Method", "mmHg"]
-aggregatable_cols = ["wd","ht","wd_rel","ht_rel", "Vertical Height"]
-grouped_trials = df_long[consistent_cols+aggregatable_cols].groupby(consistent_cols)
-#display(grouped_trials.describe())
-
-def sem(x, ddof=1):   # ddof=1 to get sample standard deviation, not the population standard deviation (np's default)
-    sem = np.std(x, ddof=ddof)/np.sqrt(len(x))
-
-def nonnan(x):
-    return x[~np.isnan(x)]
-
-df_agg_long = grouped_trials.agg([np.mean, scipy.stats.sem, np.std, np.min, np.median, np.max, np.count_nonzero], ddof=1).reset_index()
-
-df_agg_long_flat = df_agg_long.copy()
-df_agg_long_flat.columns = [".".join(col).strip(".") for col in df_agg_long.columns.values]
-#df_agg_long_flat
-
-df_agg_long.to_csv(   "data/04_aggregated/combined_df_agg_long"+".csv")
-df_agg_long.to_excel( "data/04_aggregated/combined_df_agg_long"+".xlsx")
-df_agg_long.to_pickle("data/04_aggregated/combined_df_agg_long"+".pkl")
-df_agg_long_flat.to_csv("data/04_aggregated/combined_df_agg_long_flat"+".csv")
-df_agg_long_flat.to_pickle("data/04_aggregated/combined_df_agg_long_flat"+".pkl")
-
-
-# ## Create SEM tables
-
-# In[17]:
-
-
-#df_wide.groupby("Trial").agg(np.mean)
-#df_wide.groupby(["Size","Material","Method"]).agg([np.mean, scipy.stats.sem, np.std, np.min, np.median, np.max, np.count_nonzero], ddof=1)
-df_agg_wide = df_wide.groupby(["Speculum Type","Material Type","Material","Size","Method","Spec Ang","Spec Ht",]).agg([np.count_nonzero, np.mean, scipy.stats.sem], ddof=1)
-df_agg_wide = df_agg_wide.rename(columns={"count_nonzero":"N nonzero"}).sort_index(ascending=False)
-
-df_agg_wide_brief = df_wide.groupby(["Material Type","Material","Size","Method","Spec Ang"]).agg([np.mean, scipy.stats.sem], ddof=1)
-df_agg_wide_brief = df_agg_wide_brief.drop(columns=["ht_rel"],level=0).drop(columns=[0],level=1).sort_index(ascending=False, level=[0], sort_remaining=False)
-df_agg_wide_brief = df_agg_wide_brief.rename(columns={"Vertical Height":"Opening Height (cm)","wd_rel":"Width % (wd_rel)"})
-df_agg_wide_brief = df_agg_wide_brief.rename(index={"Unspecified":"","None":""},level=2).rename(index={"Precut":"","None":"","Two":"Two finger","Middle":"Middle finger"},level=3)
-# Save
-df_agg_wide.to_excel("data/04_aggregated/combined_df_agg_wide.xlsx")
-df_agg_wide.to_pickle("data/04_aggregated/combined_df_agg_wide.pkl")
-
-# Save table
-styled = df_agg_wide_brief.style.format(na_rep="---", precision=3)
-#df_agg_wide_brief.round(3).to_excel("outputs/tables/mean_and_sem_brief.xlsx")
-styled.to_excel("outputs/tables/mean_and_sem_brief.xlsx")
-get_ipython().run_line_magic('ls', 'outputs/tables')
-
-df_agg_wide_brief.to_excel("data/04_aggregated/combined_df_agg_wide_brief.xlsx")
-df_agg_wide_brief.to_pickle("data/04_aggregated/combined_df_agg_wide_brief.pkl")
-
-display(styled)
-
-
 # # Skip ahead from loaded code
 
-# In[6]:
+# In[ ]:
 
+
+speculum_df_raw = pd.read_pickle("data/02_intermediate/speculum_df_raw"+".pkl")
+speculum_df_notfailed = pd.read_pickle("data/02_intermediate/speculum_df_notfailed"+".pkl")
 
 labels_df = pd.read_csv("data/02_intermediate/labels_df.csv", index_col=0)
 #with open("data/02_intermediate/label_from_id_dict"+".json", "r") as infile:
@@ -413,9 +176,9 @@ df_multiindex = pd.read_pickle("data/03_processed/combined_df_multiindex"+".pkl"
 
 # # Set up for displaying
 
-# ## setup dicts and helper functions
+# ## Setup dicts and helper functions
 
-# In[84]:
+# In[ ]:
 
 
 category_orders={"Size": ["S", "M", "L","Unspecified","None"],
@@ -449,23 +212,37 @@ def filter_by_criteria(criteria:dict, starting_df:pd.DataFrame) -> pd.DataFrame:
     return starting_df.loc[ np.all(conditions, axis=0) ]
 
 
-# ### Setup  plotly
+# ## Setup  plotly
 
-# In[31]:
+# In[ ]:
 
 
 default_plotly_save_scale = 4
-def save_plotly_figure(fig, file_name:str, animated=False, scale=default_plotly_save_scale, save_in_subfolder:str=None):
+def save_plotly_figure(fig, file_name:str, animated=False, scale=None, save_in_subfolder:str=None, extensions=None):
     """
     - for saving plotly.express figures only - not for matplotlib
     - fig is of type plotly.graph_objs._figure.Figure,
     - Requires kaleido installation for the static (non-animated) images
     """    
-    fig.write_html( get_path_to_save(save_filename=file_name, extension="html") )
-    if not animated:
-        fig.write_image( get_path_to_save(save_filename=file_name, save_in_subfolder=save_in_subfolder, extension="svg"), scale=scale)
-        fig.write_image( get_path_to_save(save_filename=file_name, save_in_subfolder=save_in_subfolder, extension="png"), scale=scale)
-        #fig.write_image(os.path.join(image_folder_path, file_name, save_in_subfolder=save_in_subfolder+".jpeg"), scale=scale)
+    if scale is None:
+        scale = default_plotly_save_scale
+    if extensions is None:
+        extensions = ["html"]
+        if not animated:
+            # options = ['png', 'jpg', 'jpeg', 'webp', 'svg', 'pdf', 'eps', 'json']
+            extensions += ["eps","png","pdf"]
+
+    for extension in extensions:
+        try:
+            if extension in ["htm","html"]:
+                    fig.write_html( get_path_to_save(save_filename=file_name, save_in_subfolder=save_in_subfolder, extension=extension), 
+                        full_html=False,
+                        include_plotlyjs="directory" )
+            else:
+                fig.write_image(get_path_to_save(save_filename=file_name, save_in_subfolder=save_in_subfolder, extension=extension), scale=scale)
+        except ValueError as exc:
+            import traceback
+            #traceback.print_exception()
 
 #col_options = {col_name:pd.unique(df_long[col_name]).tolist() for col_name in consistent_cols}
 #display(col_options)
@@ -479,7 +256,7 @@ def save_plotly_figure(fig, file_name:str, animated=False, scale=default_plotly_
 
 # ##### Define image plotting function
 
-# In[8]:
+# In[ ]:
 
 
 def plot_combined_images(order_current, label_dict, df_long=df_long, do_save=True, do_print=False, dpi=None):
@@ -599,7 +376,7 @@ def plot_combined_images(order_current, label_dict, df_long=df_long, do_save=Tru
 
 # ##### Plot the images
 
-# In[46]:
+# In[ ]:
 
 
 image_labels = project.label_generator()
@@ -611,8 +388,8 @@ label_dict = {label.data.external_id: label for label in image_labels}
 #plot_combined_images(order_current=order_current, label_dict=label_from_id_dict, do_print=True, dpi=150)
 
 # condom category starts at order=22
-for order_current in range(22, df_long["Order"].max()+1):
-    plot_combined_images(order_current=order_current, label_dict=label_from_id_dict, do_print=True, dpi=150)
+#for order_current in range(22, df_long["Order"].max()+1):
+#    plot_combined_images(order_current=order_current, label_dict=label_from_id_dict, do_print=True, dpi=150)
 
 
 # ### Plotly plots (new)
@@ -620,7 +397,7 @@ for order_current in range(22, df_long["Order"].max()+1):
 # #### Plotting trial images 
 # (trying in plotly instead of matplotlib above)
 
-# In[10]:
+# In[ ]:
 
 
 filename = "20220423_142023.jpg"
@@ -656,183 +433,205 @@ with PIL.Image.open(f'data/01_raw/photos/glove/{filename}') as image_orig:
 
 # #### Plotting trial images - subplots
 
-# In[90]:
+# In[ ]:
 
 
-n=10   # how many x to reduce the images by to make code faster and files smaller
+5 // 2
+
+
+# In[ ]:
+
+
 # figure size in px
-width  = 1100*2
-height =  300*2
 
-order_current=0
-#order_current=order_current+1
+facet_col_wrap = 6
+if facet_col_wrap==6:
+    width  = 1100*2
+    height =  300*2
+elif facet_col_wrap==3:
+    width  = 500*2
+    height =  600*2
+else:
+    assert False
 
 
-df_sampled = df_long.loc[df_long.Order==order_current]
-while df_sampled.shape[0]==0:  # skip ahead for empty order_currents
-    order_current=order_current+1 if order_current < df_long.Order.max() else 0
+#col_options = {col_name:pd.unique(df_long[col_name]).tolist() for col_name in consistent_cols}
+#display(col_options)
+
+def plot_combined_images_plotly(order_current, df_long=df_long, do_save=True, save_scale=None, save_extensions=None, n=None):
+    if order_current is None:
+        order_current=0
+        #order_current=order_current+1
+
     df_sampled = df_long.loc[df_long.Order==order_current]
+    while df_sampled.shape[0]==0:  # skip ahead for empty order_currents
+        return False
+        #order_current=order_current+1 if order_current < df_long.Order.max() else 0
+        #df_sampled = df_long.loc[df_long.Order==order_current]
 
-data_row = df_sampled.iloc[0] # get first row
-base_row = df_sampled.loc[df_sampled.mmHg==0].squeeze()
+    data_row = df_sampled.iloc[0] # get first row
+    base_row = df_sampled.loc[df_sampled.mmHg==0].squeeze()
 
-base_folder = os.path.join("data/01_raw/photos/", ("glove" if data_row["Material Type"]=="Glove" else "condom/orig"))
-images = np.array([skimage.io.imread( os.path.join(base_folder, filename))  for filename in df_sampled.Filename])
-# rotate
-# images = np.rot90(images, k=1, axes=(1,2))
-dim = images.shape[1:]  # should be 3 values, with the last being color dim
-dim_small = tuple([int(dim[0]/10), int(dim[1]/10), *dim[2:]])
-
-
-
-if data_row['Material Type'] == "Glove":
-    data_row_str = [
-                    f"'{data_row['Method']} finger' method" ,
-                    f"with {data_row['Size']}. {data_row['Material'].lower()} glove," " " f"Trial #{data_row['Trial']}"
-                    ]
-    data_row_elem_str = [
-                    f"'{data_row['Method']} finger' method" " " f"at {data_row['mmHg']}mmHg",
-                    f"with {data_row['Size']}. {data_row['Material'].lower()} glove," " " f"Trial #{data_row['Trial']}"
-                    ]
-elif data_row['Material Type'] == "Condom":
-    data_row_str = [f"{data_row['Material']} brand condom," " " f"Trial #{data_row['Trial']}"
-                    ]
-    data_row_elem_str = [
-                    f"{data_row['Material']} brand condom" " " f"at {data_row['mmHg']}mmHg," " " f"Trial #{data_row['Trial']}"
-                    ]
-elif data_row['Material Type'] == "None":
-    data_row_str = [f"No material," " " f"Trial #{data_row['Trial']}"
-                    ]
-    data_row_elem_str = [
-                    f"No material" " " f"at {data_row['mmHg']}mmHg," " " f"Trial #{data_row['Trial']}"
-                    ]
+    base_folder = os.path.join("data/01_raw/photos/", ("glove" if data_row["Material Type"]=="Glove" else "condom/orig"))
+    images = np.array([skimage.io.imread( os.path.join(base_folder, filename))  for filename in df_sampled.Filename])
+    # rotate
+    # images = np.rot90(images, k=1, axes=(1,2))
+    dim = images.shape[1:]  # should be 3 values, with the last being color dim
+    dim_small = tuple([int(dim[0]/n), int(dim[1]/n), *dim[2:]])
 
 
 
-fig = px.imshow( images[:, ::n, ::n, :], binary_string=True, origin="lower", aspect="equal",
-                facet_col=0, facet_col_spacing=0.0, 
-                #category_orders=category_orders, 
-                labels={**labels,"facet_col":"mmHg"},
-                #title = " ".join(data_row_str)
-                )  # facet_col_wrap=6, 
-
-# Add annotations
-#for index, data_row in df_sampled.iterrows():
-for index, (index_of_all, data_row) in enumerate(df_sampled.iterrows()):
-    x0=(dim[1]-(data_row.wd_start))/n;
-    x1=(dim[1]-(data_row.wd_start+data_row.wd))/n
-    y0=(data_row.ht_start)/n; 
-    y1=((data_row.ht_start+data_row.ht))/n
-    # Draw box around labeled area
-    fig.add_shape(
-        type="rect",
-        x0=x0, x1=x1, 
-        y0=y0, y1=y1,
-        xref='x', yref='y',
-        line=dict(
-            color="red",
-            width=4,
-            dash="dot",
-        ), opacity=0.5,
-        row=1, col=index+1,
-    )
-    # Draw vertical lines around the labeled width (verlaps with box above)
-    for ind, x in enumerate([x0, x1]):
-        fig.add_vline(
-            x=x,
-            line=dict(color="red",width=4,dash="dot"), 
-            opacity=0.75,
-            row=1, col=index+1,
-            annotation_position=["top right","top left"][ind],
-            annotation=dict(text=[
-                                  f"<b>{data_row.wd/base_row.wd:.1%}</b><br>of baseline ",
-                                  f" <b>{data_row.wd:.0f}px</b><br>view width"][ind],
-                            font_size=14,
-                            bgcolor="rgba(255,255,255,0.4)",
-                            ),
-        ),
-    fig.layout.annotations[index]["text"] = f"<b>At {data_row.mmHg}mmHg</b>"
-    #fig.layout.annotations[index]["text"] = f"View Width: {data_row.wd:.0f}px ({data_row.wd/base_row.wd:.1%})"
-    #fig.update_xaxes(title=f"At {data_row.mmHg}mmHg", row=1, col=index+1)
+    if data_row['Material Type'] == "Glove":
+        data_row_str = [
+                        f"'{data_row['Method']} finger' method" ,
+                        f"with {data_row['Size']}. {data_row['Material'].lower()} glove," " " f"Trial #{data_row['Trial']}"
+                        ]
+        data_row_elem_str = [
+                        f"'{data_row['Method']} finger' method" " " f"at {data_row['mmHg']}mmHg",
+                        f"with {data_row['Size']}. {data_row['Material'].lower()} glove," " " f"Trial #{data_row['Trial']}"
+                        ]
+    elif data_row['Material Type'] == "Condom":
+        data_row_str = [f"{data_row['Material']} brand condom," " " f"Trial #{data_row['Trial']}"
+                        ]
+        data_row_elem_str = [
+                        f"{data_row['Material']} brand condom" " " f"at {data_row['mmHg']}mmHg," " " f"Trial #{data_row['Trial']}"
+                        ]
+    elif data_row['Material Type'] == "None":
+        data_row_str = [f"No material," " " f"Trial #{data_row['Trial']}"
+                        ]
+        data_row_elem_str = [
+                        f"No material" " " f"at {data_row['mmHg']}mmHg," " " f"Trial #{data_row['Trial']}"
+                        ]
 
 
+    
+    def ind_to_row(index):
+        return 6//facet_col_wrap - ((index // facet_col_wrap))   # // is integer division (divison without remainder)
+    def ind_to_col(index):
+        return (index %  facet_col_wrap) + 1   # % is modulus operator
 
+    fig = px.imshow( images[:, ::n, ::n, :], binary_string=True, origin="lower", aspect="equal",
+                    facet_col=0, facet_col_spacing=0.0, 
+                    facet_col_wrap=facet_col_wrap, 
+                    #category_orders=category_orders, 
+                    labels={**labels,"facet_col":"mmHg"},
+                    #title = " ".join(data_row_str)
+                    )  
 
-# Add filename and other info annotation
-for index, (index_of_all, data_row) in enumerate(df_sampled.iterrows()):
-    fig.add_annotation(
-        x=1, y=1,
-        xref="paper", yref="paper",
-        text="<br>".join(data_row_elem_str) + "<br>Filename: " + data_row.Filename + "<br>Size: " + str(dim[0]) + "x" + str(dim[1]) + "px" + ("" if n==1 else f" (reduced {n}x to display here)"),
-        xanchor="left", yanchor="bottom", align="left", # align only matters if multiline. 'anchor' arguments actually change the position within the graph
-        font=dict(size=10, color="blue",family="Courier"),
-        row=1, col=index+1,
-        showarrow=False, 
+    # Add annotations
+    #for index, data_row in df_sampled.iterrows():
+    for index, (index_of_all, data_row) in enumerate(df_sampled.iterrows()):
+        x0=(dim[1]-(data_row.wd_start))/n;
+        x1=(dim[1]-(data_row.wd_start+data_row.wd))/n
+        y0=(data_row.ht_start)/n; 
+        y1=((data_row.ht_start+data_row.ht))/n
+        # Draw box around labeled area
+        fig.add_shape(
+            type="rect",
+            x0=x0, x1=x1, 
+            y0=y0, y1=y1,
+            xref='x', yref='y',
+            line=dict(
+                color="red",
+                width=4,
+                dash="dot",
+            ), opacity=0.5,
+            row=ind_to_row(index), col=ind_to_col(index),
         )
-    
-    
+        # Draw vertical lines around the labeled width (verlaps with box above)
+        for ind, x in enumerate([x0, x1]):
+            fig.add_vline(
+                x=x,
+                line=dict(color="red",width=4,dash="dot"), 
+                opacity=0.75,
+                row=ind_to_row(index), col=ind_to_col(index),
+                annotation_position=["top right","top left"][ind],
+                annotation=dict(text=[
+                                    f"<b>{data_row.wd/base_row.wd:.1%}</b><br>of baseline ",
+                                    f" <b>{data_row.wd:.0f}px</b><br>view width"][ind],
+                                font_size=14,
+                                bgcolor="rgba(255,255,255,0.4)",
+                                ),
+            ),
+        fig.layout.annotations[index]["text"] = f"<b>At {data_row.mmHg}mmHg</b>"
+        #fig.layout.annotations[index]["text"] = f"View Width: {data_row.wd:.0f}px ({data_row.wd/base_row.wd:.1%})"
+        #fig.update_xaxes(title=f"At {data_row.mmHg}mmHg", row=ind_to_row(index), col=ind_to_col(index))
 
-#fig.update_traces(hovertemplate="x=%{x*" + str(n) + "} <br> y=%{y*" + str(n) + "} <br> color: %{color}")
-
-ycoords, xcoords = np.meshgrid(np.arange(dim_small[0])*n, np.arange(dim_small[1])*n, indexing="ij")
-customdata = np.dstack((xcoords, ycoords))  # shape=(height, width, number of data values)
-#fig.update(data=[{'customdata': np.dstack(np.meshgrid(np.arange(dim_small[0])*n, np.arange(dim_small[1])*n, indexing="ij")),
-#    'hovertemplate': "x: %{x} <br> y: %{y} <br> xn: %{customdata[0]} <br> yn: %{customdata[1]:.3f} <br> z: %{z} <br> color: %{color}<extra></extra>"}])
 
 
 
-fig.update_traces(
-    customdata=customdata,
-    hovertemplate="x=%{customdata[0]} <br>y=%{customdata[1]} <br>color=%{color}"
+    # Add filename and other info annotation
+    for index, (index_of_all, data_row) in enumerate(df_sampled.iterrows()):
+        fig.add_annotation(
+            x=1, y=1,
+            xref="paper", yref="paper",
+            text="<br>".join(data_row_elem_str) + "<br>Filename: " + data_row.Filename + "<br>Size: " + str(dim[0]) + "x" + str(dim[1]) + "px" + ("" if n==1 else f" (reduced {n}x to display here)"),
+            xanchor="left", yanchor="bottom", align="left", # align only matters if multiline. 'anchor' arguments actually change the position within the graph
+            font=dict(size=10, color="blue",family="Courier"),
+            row=ind_to_row(index), col=ind_to_col(index),
+            showarrow=False, 
+            )
+        
+        
+
+    #fig.update_traces(hovertemplate="x=%{x*" + str(n) + "} <br> y=%{y*" + str(n) + "} <br> color: %{color}")
+
+    ycoords, xcoords = np.meshgrid(np.arange(dim_small[0])*n, np.arange(dim_small[1])*n, indexing="ij")
+    customdata = np.dstack((xcoords, ycoords))  # shape=(height, width, number of data values)
+    #fig.update(data=[{'customdata': np.dstack(np.meshgrid(np.arange(dim_small[0])*n, np.arange(dim_small[1])*n, indexing="ij")),
+    #    'hovertemplate': "x: %{x} <br> y: %{y} <br> xn: %{customdata[0]} <br> yn: %{customdata[1]:.3f} <br> z: %{z} <br> color: %{color}<extra></extra>"}])
+
+
+
+    fig.update_traces(
+        customdata=customdata,
+        hovertemplate="x=%{customdata[0]} <br>y=%{customdata[1]} <br>color=%{color}"
+        )
+
+    fig.update_layout(
+        font=dict(
+            family="Arial",
+            size=20,
+            color="black",
+        ),
+        title={
+            "y":1,
+            "x":0.5,
+            "xanchor": "center",
+            "yanchor": "top",
+            "font":dict(size=20)
+        }, 
+        paper_bgcolor="#F9F9F9",
+        margin=dict(l=0, r=0, t=40, b=0),
+        width=width, height=height,
+        #dragmode="drawopenpath",
+        newshape_line_color="cyan",
     )
 
-fig.update_layout(
-    font=dict(
-        family="Arial",
-        size=20,
-        color="black",
-    ),
-    title={
-        "y":1,
-        "x":0.5,
-        "xanchor": "center",
-        "yanchor": "top",
-        "font":dict(size=20)
-    }, 
-    paper_bgcolor="#F9F9F9",
-    margin=dict(l=0, r=0, t=40, b=0),
-    width=width, height=height,
-    #dragmode="drawopenpath",
-    newshape_line_color="cyan",
-)
+
+    fig.update_xaxes(showticklabels=False)  # , title_text=[f"At {mmHg}mmHg" for mmHg in df_sampled.mmHg]
+    fig.update_yaxes(showticklabels=False)
+
+    fig.for_each_trace(lambda t: t.update(name = f"At {int(t.name)*40}mmHg",
+                                        #legendgroup = f"At {t.name*40}mmHg",
+                                        #hovertemplate = t.hovertemplate.replace(t.name, f"At {int(t.name)*40}mmHg")
+                                        )
+                    )
+
+    fig.show()
+
+    if do_save:
+        save_plotly_figure(fig, file_name=f"Trial {order_current}) {' '.join(data_row_str)}", save_in_subfolder="Each Trial - Plotly", 
+                           scale=save_scale, extensions=save_extensions )
 
 
-fig.update_xaxes(showticklabels=False)  # , title_text=[f"At {mmHg}mmHg" for mmHg in df_sampled.mmHg]
-fig.update_yaxes(showticklabels=False)
-
-fig.for_each_trace(lambda t: t.update(name = f"At {int(t.name)*40}mmHg",
-                                      #legendgroup = f"At {t.name*40}mmHg",
-                                      #hovertemplate = t.hovertemplate.replace(t.name, f"At {int(t.name)*40}mmHg")
-                                     )
-                  )
-
-fig.show()
-
-save_plotly_figure(fig, file_name=f"Trial {order_current}) {' '.join(data_row_str)}", save_in_subfolder="Each Trial - Plotly" )
+# In[ ]:
 
 
-# In[82]:
-
-
-newnames = {'col1':'hello', 'col2': 'hi'}
-
-fig.for_each_trace(lambda t: t.update(name = f"At {t.name*40}mmHg",
-                                      legendgroup = newnames[t.name],
-                                      hovertemplate = t.hovertemplate.replace(t.name, newnames[t.name])
-                                     )
-                  )
-fig.show()
-fig.for_each_trace(lambda t: print(type(t.name)))
+#plot_combined_images_plotly(order_current=25, save_extensions=["html","jpg","pdf"], n=10)
+for order_current in range(1,df_long["Order"].max()+1):
+    print(order_current)
+    plot_combined_images_plotly(order_current=order_current, save_extensions=["html","jpg","pdf"], n=10 )
 
 
 # ## Plot Individual trial level data
@@ -873,297 +672,6 @@ save_plotly_figure(fig, file_name="Basic, all trials", scale=4)
 250 / (1/25.4 * 300/4), 550 / (1/25.4 * 300/4)
 
 
-# ## Plot aggregates across trials
-
-# #### Setup for plotting aggregates
-
-# In[ ]:
-
-
-def customize_figure(fig, width=640, height=360, by_mmHg=True) -> dict:
-    """ - for plotly figures only. """
-    
-    if by_mmHg:
-        fig.update_xaxes(tickprefix="At ", ticksuffix="mmHg", showtickprefix="all", showticksuffix="all", tickfont=dict(size=16),
-                        mirror=True, linewidth=2, 
-                        title=dict(text="Applied Circumferential Pressure", font=dict(size=20, family="Arial Black")),
-                        )
-        fig.update_yaxes(tickformat=".0%", tickwidth=2,  nticks=21, ticklabelstep=4,
-                        mirror="ticks", linewidth=2, range=(0,1), 
-                        title=dict(text="Obstruction of<br>Field of View (S.E.)",font=dict(size=18, family="Arial Black")), 
-                        showgrid=True, gridcolor="#DDD", 
-                        showspikes=True, spikemode="across", spikethickness=2, spikedash="solid", # ticklabelposition="inside top",
-                        )
-    #fig.update_traces(textangle=0, textposition="outside", cliponaxis=False)
-    fig.update_layout(
-        font=dict(
-            family="Arial",
-            size=16,
-            color="black",
-        ),
-        title={
-            "y":1,
-            "x":0.5,
-            "xanchor": "center",
-            "yanchor": "top",
-            "font":dict(size=16)
-        }, 
-        width=width, height=height,
-        margin=dict(l=20, r=20, t=20, b=20),
-        legend=dict(
-            title={"font_family": "Arial Black",},
-            yanchor="middle",
-            y=0.5,
-            xanchor="center",
-            x=0.08,
-            #bgcolor="LightSteelBlue",
-            bordercolor="Black", #font_size=16,
-            borderwidth=2,
-        ), 
-        bargap=0.05, bargroupgap=0.0,
-        dragmode="drawopenpath",
-        newshape_line_color="cyan",
-    )
-
-    fig.update_traces(textfont_size=16, textangle=0, textfont_color="#FFF", 
-                      textposition="inside", cliponaxis=False, #textfont_family="Courier",
-                      marker_line_color="#000", marker_line_width=2
-                    )
-    if by_mmHg:
-        fig.update_traces(texttemplate=[None]+[""" <br><b>%{y:.1%}</b>"""]*5,)
-
-    config = {
-        "toImageButtonOptions" : {
-            "format": "png", # one of png, svg, jpeg, webp
-            "filename": 'custom_image',
-            "scale": default_plotly_save_scale # Multiply title/legend/axis/canvas sizes by this factor
-        },
-        "modeBarButtonsToAdd": ["drawline","drawopenpath","drawclosedpath","drawcircle","drawrect","eraseshape"]
-    }
-
-    return config
-
-
-
-
-
-# ### Gloves
-
-# In[ ]:
-
-
-#criteria = {"Material":["Nitrile","None"], "Method":["Middle","None"]}
-criteria = {"Material":"Nitrile", "Method":"Middle"}
-varying = "Size"
-
-df_sampled = filter_by_criteria(criteria,df_agg_long_flat)
-
-fig = px.bar(df_sampled, 
-             x="mmHg",y="wd_rel.mean", error_y="wd_rel.sem", #error_y_minus=[0]*18, 
-             color=varying, pattern_shape=varying, 
-             color_discrete_sequence=px.colors.qualitative.Safe, pattern_shape_sequence=["/", "+", "\\"], 
-             barmode="group", #text=[".1%<br><br> " for a in range(18)],
-             hover_data=["Size","Material","Method"],
-             title=f"Varying {varying} with " + criteria_to_str(criteria), 
-             category_orders=category_orders, labels=labels, template="simple_white", 
-             )
-#fig.update_traces(hovertemplate="""%{x}""") #
-config = customize_figure(fig, width=1100, height=300)
-
-fig.for_each_trace( lambda trace: trace.update(marker=dict(color="#000",opacity=0.33,pattern=dict(shape=""))) if trace.name == "None" else (), )
-
-fig.show(config=config)
-save_plotly_figure(fig, file_name=f"Across {varying}- " + criteria_to_str(criteria) )
-
-
-# In[ ]:
-
-
-#criteria = {"Size":["M","None"], "Method":["Middle","None"]}
-criteria = {"Size":"M", "Method":"Middle"}
-
-varying = "Material"
-
-df_sampled = filter_by_criteria(criteria,df_agg_long_flat)
-fig = px.bar(df_sampled, 
-             x="mmHg",y="wd_rel.mean", error_y="wd_rel.sem", 
-             color=varying, pattern_shape=varying, 
-             color_discrete_sequence=px.colors.qualitative.Set1, pattern_shape_sequence=["x", "+", "\\"], 
-             barmode="group", #text=[".1%<br><br> " for a in range(18)],
-             hover_data=["Size","Material","Method"],
-             title=f"Varying {varying} with " + criteria_to_str(criteria), 
-             category_orders=category_orders, labels={**labels,"Material":"Glove<br>Material"}, template="simple_white", 
-             )
-
-config = customize_figure(fig, width=1100, height=300)
-
-fig.for_each_trace( lambda trace: trace.update(marker=dict(color="#000",opacity=0.33,pattern=dict(shape=""))) if trace.name == "None" else (), )
-
-fig.show(config=config)
-save_plotly_figure(fig, file_name=f"Across {varying}- " + criteria_to_str(criteria) )
-
-
-# In[ ]:
-
-
-#criteria = {"Size":["M","None"], "Material":["Nitrile","None"]}
-criteria = {"Size":"M", "Material":"Nitrile"}
-
-varying = "Method"
-
-df_sampled = filter_by_criteria(criteria,df_agg_long_flat)
-df_sampled["Method"] = df_sampled["Method"].replace({"Middle":"Middle finger","Two":"Two fingers"})
-fig = px.bar(df_sampled, 
-             x="mmHg",y="wd_rel.mean", error_y="wd_rel.sem", 
-             color=varying, pattern_shape=varying, 
-             color_discrete_sequence=px.colors.qualitative.D3, pattern_shape_sequence=["x", "+", "-"], 
-             barmode="group", #text=[".1%<br><br> " for a in range(18)],
-             hover_data=["Size","Material","Method","wd_rel.amin","wd_rel.median","wd_rel.amax"],
-             title=f"Varying {varying} with " + criteria_to_str(criteria), 
-             category_orders=category_orders, labels=labels, template="simple_white", 
-             )
-
-config = customize_figure(fig, width=1100, height=300)
-
-fig.for_each_trace( lambda trace: trace.update(marker=dict(color="#000",opacity=0.33,pattern=dict(shape=""))) if trace.name == "None" else (), )
-
-
-
-fig.show(config=config)
-save_plotly_figure(fig, file_name=f"Across {varying}- " + criteria_to_str(criteria) )
-
-
-# Relative Obstruction of Field of View
-# 
-# Percent Field of View Obstructed
-
-# ### Plot condoms
-
-# In[ ]:
-
-
-#criteria = {"Material Type":"Condom"}
-criteria = {"Material Type":["Condom","None"]}
-varying = "Material"
-
-#colors = px.colors.qualitative.Plotly.copy() #[0:4]+["black"]
-#colors = ['black']*10
-#colors[8] = "black"
-#colors = ['#636EFA', '#EF553B',"Black", '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
-#colors={"Trojan":"red","gray":"blue","None":"green","Lifestyle":"green","Skyn":"blue"}
-#df_sampled = df_agg_long_flat.loc[ np.all([df_agg_long[arg]==val for arg, val in criteria.items()], axis=0) ]
-df_sampled = filter_by_criteria(criteria,df_agg_long_flat)
-#df_sampled["color"] = df_sampled["Material"].copy().replace(colors)
-colors = px.colors.qualitative.Safe #[0:4]+["black"]
-fig = px.bar(df_sampled, 
-             x="mmHg",y="wd_rel.mean", error_y="wd_rel.sem", 
-             color=varying, pattern_shape=varying, 
-             color_discrete_sequence= px.colors.qualitative.Safe, pattern_shape_sequence=["|", "-", "\\"], 
-             barmode="group", #text=[".1%<br><br> " for a in range(18)],
-             hover_data=["Size","Material","Method"],
-             title=f"Varying {varying} with " + criteria_to_str(criteria), 
-             category_orders=category_orders, labels={**labels,"Material":"Condom<br>Brand"}, template="simple_white", 
-             )
-
-config = customize_figure(fig, width=1100, height=300)
-
-for idx, trace in enumerate(fig["data"]):
-    trace["name"] = trace["name"].split()[-1]
-
-fig.for_each_trace( lambda trace: trace.update(marker=dict(color="#000",opacity=0.33,pattern=dict(shape=""))) if trace.name == "None" else (), )
-
-
-fig.show(config=config)
-#save_plotly_figure(fig, file_name=f"Across {varying}- " + criteria_to_str(criteria) )
-
-
-# ## Plot vertical heights
-
-# In[ ]:
-
-
-criteria = {"mmHg":[0,1], "Spec Ang":[3,5]}
-varying = "Material"
-
-df_sampled = df_agg_long_flat.loc[ np.all([ (type(val)!=list and df_agg_long[arg]==val ) or np.in1d(df_agg_long[arg],val)  for arg, val in criteria.items()], axis=0) ]
-df_sampled = df_sampled.sort_values(["Vertical Height.mean"]).reset_index()
-df_sampled["Spec Ang"] = df_sampled["Spec Ang"].astype(str)  # makes discrete color plotting and string concatenation easier
-df_sampled["name"] = df_sampled["Size"] + "-" + df_sampled["Material"] + "-"  + df_sampled["Material Type"] + "-"  + df_sampled["Method"] + "-"  + df_sampled["Spec Ang"]
-
-extra_trials = speculum_df_raw.loc[speculum_df_raw["Filename"]=="None"].copy()
-extra_trials = extra_trials.drop(extra_trials[extra_trials["Spec Ang"] == 4].index)
-extra_trials["Vertical Height.mean"] = extra_trials["Vertical Height"]
-extra_trials["Vertical Height.sem"] = None
-with_extra = pd.concat([df_sampled,extra_trials])
-with_extra = with_extra.drop(columns=[col for col in with_extra if col not in df_sampled.columns])
-
-df_sampled = with_extra
-df_sampled["Spec Ang"] = df_sampled["Spec Ang"].astype(str)  # makes discrete color plotting and string concatenation easier
-df_sampled["name"] = df_sampled["Size"] + "-" + df_sampled["Material"] + "-"  + df_sampled["Material Type"] + "-"  + df_sampled["Method"] #+ "-"  + df_sampled["Spec Ang"]
-
-names={
-    "None-None-None-None-3": "None", #"None<br>(3 clicks)",
-    "None-None-None-None-5": "None", #"None<br>(5 clicks)",
-    "Unspecified-Durex-Condom-Precut-3": "<i>Durex</i><br>Condom",
-    "Unspecified-Lifestyle-Condom-Precut-3": "<i>Lifestyle</i><br>Condom",
-    "Unspecified-Skyn-Condom-Precut-3": "<i>Skyn</i><br>Condom",
-    "Unspecified-Trojan-Condom-Precut-3": "<i>Trojan</i><br>Condom",
-    "M-Vinyl-Glove-Middle-3": "Medium<br><i>Vinyl</i><br>Glove",
-    "L-Nitrile-Glove-Middle-5": "<i>Large</i><br>Nitrile<br>Glove",
-    "M-Nitrile-Glove-Middle-5": "Medium<br>Nitrile<br>Glove",
-    "M-Nitrile-Glove-Two-5": "Medium<br>Nitrile<br>Glove,<br><i>Two-fingers</i>",
-    "S-Nitrile-Glove-Middle-5": "<i>Small</i><br>Nitrile<br>Glove"
-}
-names={
-    "None-None-None-None": "None", #"None<br>(3 clicks)",
-    "Unspecified-Durex-Condom-Precut": "<i>Durex</i><br>Condom",
-    "Unspecified-Lifestyle-Condom-Precut": "<i>Lifestyle</i><br>Condom",
-    "Unspecified-Skyn-Condom-Precut": "<i>Skyn</i><br>Condom",
-    "Unspecified-Trojan-Condom-Precut": "<i>Trojan</i><br>Condom",
-    "M-Vinyl-Glove-Middle": "Medium<br><i>Vinyl</i><br>Glove",
-    "L-Nitrile-Glove-Middle": "<i>Large</i><br>Nitrile<br>Glove",
-    "M-Nitrile-Glove-Middle": "Medium<br>Nitrile<br>Glove",
-    "M-Nitrile-Glove-Two": "Medium<br>Nitrile<br>Glove,<br><i>Two-fingers</i>",
-    "S-Nitrile-Glove-Middle": "<i>Small</i><br>Nitrile<br>Glove",
-    "S-Nitrile-Glove-Palm": "<i>Small</i><br>Nitrile<br>Glove,<br><i>Palm</i>",
-    "M-Nitrile-Glove-Palm": "<i>Medium</i><br>Nitrile<br>Glove,<br><i>Palm</i>",
-}
-df_sampled["name_formatted"] = df_sampled["name"].replace(names, value=None)
-#df_sampled["name"] = df_sampled["name_formatted"].replace(names)
-
-fig = px.bar(df_sampled, 
-             #x = np.argsort(df_sampled["Vertical Height.mean"]),
-             x = "name_formatted",
-             y="Vertical Height.mean", error_y="Vertical Height.sem", 
-             category_orders=category_orders, labels=labels, template="simple_white", 
-             hover_data=["Size","Material","Method","name"], #color = ["gray","gray","red","gray","gray"]
-             color="Spec Ang", facet_col="Spec Ang", # facet_row="Material Type",
-             )
-fig.update_xaxes(matches=None)
-fig.update_traces(texttemplate=""" <br><b>%{y:.2f}<br>cm</b>""", textposition="outside",)
-
-fig.update_xaxes(linewidth=2, #showticklabels=False, nticks=0,
-                 title=dict(text="Speculum Combination",font=dict(size=18, family="Arial Black")),
-                 )
-fig.update_yaxes(ticksuffix="cm", tickformat=".0f", tickwidth=2, range=(0,6),  nticks=6*2+1, ticklabelstep=2,
-                mirror=True, linewidth=2,
-                title=dict(text="Initial Height of <br>Speculum Opening",font=dict(size=18, family="Arial Black")), 
-                showgrid=True, gridcolor="#AAA", 
-                showspikes=True, spikemode="across", spikethickness=2, spikedash="solid", # ticklabelposition="inside top",
-                )
-
-fig.update_layout(uniformtext_minsize=12, uniformtext_mode='hide')
-
-
-fig.update_layout(showlegend=False)
-
-
-config = customize_figure(fig, width=1100, height=500, by_mmHg=False)
-
-fig.show(config=config)
-save_plotly_figure(fig, file_name=f"Vertical Height Bar Plot" )
-
-
 # ## Old plots
 
 # In[ ]:
@@ -1199,8 +707,6 @@ fig.show()
 
 
 
-
-# # Stats
 
 # ## Table styling
 
