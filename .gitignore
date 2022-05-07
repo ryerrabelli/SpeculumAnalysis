@@ -1,4 +1,6 @@
 auth/*
+"outputs/speculum_data_analysis/Each Trial - Plotly/*.html"
+outputs/Labelbox_analysis/*
 
 
 # Byte-compiled / optimized / DLL files
