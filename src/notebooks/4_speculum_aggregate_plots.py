@@ -5,7 +5,7 @@
 
 # ## Pip install
 
-# In[ ]:
+# In[1]:
 
 
 # Don't forget to restart runtime after installing
@@ -21,7 +21,7 @@ get_ipython().run_line_magic('pip', 'install plotly==5.7.0.    # need 5.7.0, not
 # ## Base imports
 # 
 
-# In[ ]:
+# In[2]:
 
 
 import os
@@ -52,7 +52,7 @@ import plotly
 import plotly.express as px
 
 
-# In[ ]:
+# In[3]:
 
 
 
@@ -115,7 +115,7 @@ def get_path_to_save(plot_props:dict=None, file_prefix="", save_filename:str=Non
     #plt.savefig(os.path.join(save_path, save_filename+"."+extension))
 
 
-# In[ ]:
+# In[4]:
 
 
 #@title ## Mount google drive and import my code
@@ -180,11 +180,15 @@ df_multiindex = pd.read_pickle("data/03_processed/combined_df_multiindex"+".pkl"
 # In[ ]:
 
 
-category_orders={"Size": ["S", "M", "L","Unspecified","None"],
-                 "Material":["Nitrile","Vinyl","Trojan", "Lifestyle", "Durex", "Skyn","None"],
-                 "Material Type":["Glove","Condom","None"],
-                 "Method":["Middle","Two","Palm","Middle finger","Two fingers","Palm","Precut","None"],
-                 "Speculum Type":["White","Green"]}
+category_orders={
+    #"Size": ["S", "M", "L","Unspecified","None"],
+    #"Size": ["S","Small", "M", "Medium", "L", "Large","Unspecified","None"],
+    "Size": ["Small", "Medium", "Large","Unspecified","None", "S", "M", "L"],  # change the order of S vs Small etc changes the color
+    "Material":["Nitrile","Vinyl","Trojan", "Lifestyle", "Durex", "Skyn","None"],
+    "Material Type":["Glove","Condom","None"],
+    "Method":["Middle","Two","Palm","Middle finger","Two fingers","Palm","Precut","None"],
+    "Speculum Type":["White","Green"]
+    }
 labels = {
     "Trial":"Trial #",
     "wd_rel":"Relative Obstruction",
@@ -211,7 +215,7 @@ def filter_by_criteria(criteria:dict, starting_df:pd.DataFrame) -> pd.DataFrame:
     return starting_df.loc[ np.all(conditions, axis=0) ]
 
 
-# ## Setup  plotly
+# ## Setup plotly figure saving
 
 # In[ ]:
 
@@ -234,10 +238,13 @@ def save_plotly_figure(fig, file_name:str, animated=False, scale=None, save_in_s
     for extension in extensions:
         try:
             if extension in ["htm","html"]:
-                    fig.write_html( get_path_to_save(save_filename=file_name, save_in_subfolder=save_in_subfolder, extension=extension), 
-                        full_html=False,
-                        include_plotlyjs="directory" )
+                #fig.update_layout(title=dict(visible=False))
+                fig.write_html( get_path_to_save(save_filename=file_name, save_in_subfolder=save_in_subfolder, extension=extension), 
+                    full_html=False,
+                    include_plotlyjs="directory" )
             else:
+                #if extension == "png":
+                #    fig.update_layout(title=dict(visible=False))
                 fig.write_image(get_path_to_save(save_filename=file_name, save_in_subfolder=save_in_subfolder, extension=extension), scale=scale)
         except ValueError as exc:
             import traceback
@@ -256,17 +263,19 @@ def save_plotly_figure(fig, file_name:str, animated=False, scale=None, save_in_s
 # In[ ]:
 
 
-def customize_figure(fig, width=640, height=360, by_mmHg=True) -> dict:
+def customize_figure(fig, width=640, height=360, by_mmHg=True, brs=1) -> dict:
     """ - for plotly figures only. """
     
     if by_mmHg:
-        fig.update_xaxes(tickprefix="At ", ticksuffix="mmHg", showtickprefix="all", showticksuffix="all", tickfont=dict(size=16),
+        fig.update_xaxes( #tickprefix="At ",   # Dr. WJ and Ashkhan didn't like it
+                         ticksuffix="mmHg", showtickprefix="all", showticksuffix="all", tickfont=dict(size=16),
                         mirror=True, linewidth=2, 
                         title=dict(text="Applied Circumferential Pressure", font=dict(size=20, family="Arial Black")),
                         )
         fig.update_yaxes(tickformat=".0%", tickwidth=2,  nticks=21, ticklabelstep=4,
                         mirror="ticks", linewidth=2, range=(0,1), 
                         title=dict(text="Obstruction of<br>Field of View (S.E.)",font=dict(size=18, family="Arial Black")), 
+                        #title=dict(text="Width Obstructed of<br>Field of View (S.E.)",font=dict(size=18, family="Arial Black")), 
                         showgrid=True, gridcolor="#DDD", 
                         showspikes=True, spikemode="across", spikethickness=2, spikedash="solid", # ticklabelposition="inside top",
                         )
@@ -306,7 +315,7 @@ def customize_figure(fig, width=640, height=360, by_mmHg=True) -> dict:
                       marker_line_color="#000", marker_line_width=2
                     )
     if by_mmHg:
-        fig.update_traces(texttemplate=[None]+[""" <br><b>%{y:.1%}</b>"""]*5,)
+        fig.update_traces(texttemplate=[None]+[" "+("<br>"*brs)+"<b>%{y:.1%}</b>"]*5,)
 
     config = {
         "toImageButtonOptions" : {
@@ -335,6 +344,7 @@ criteria = {"Material":"Nitrile", "Method":"Middle"}
 varying = "Size"
 
 df_sampled = filter_by_criteria(criteria,df_agg_long_flat)
+df_sampled["Size"] = df_sampled["Size"].replace({"S":"Small", "M":"Medium", "L":"Large"})
 
 fig = px.bar(df_sampled, 
              x="mmHg",y="wd_rel.mean", error_y="wd_rel.sem", #error_y_minus=[0]*18, 
@@ -351,7 +361,8 @@ config = customize_figure(fig, width=1100, height=300)
 fig.for_each_trace( lambda trace: trace.update(marker=dict(color="#000",opacity=0.33,pattern=dict(shape=""))) if trace.name == "None" else (), )
 
 fig.show(config=config)
-save_plotly_figure(fig, file_name=f"Across {varying}- " + criteria_to_str(criteria) )
+fig.update_layout(title=dict(text=""))
+save_plotly_figure(fig, file_name=f"Fig 4- Across {varying}- " + criteria_to_str(criteria) )
 
 
 # #### Glove material
@@ -368,7 +379,7 @@ df_sampled = filter_by_criteria(criteria,df_agg_long_flat)
 fig = px.bar(df_sampled, 
              x="mmHg",y="wd_rel.mean", error_y="wd_rel.sem", 
              color=varying, pattern_shape=varying, 
-             color_discrete_sequence=px.colors.qualitative.Set1, pattern_shape_sequence=["x", "+", "\\"], 
+             color_discrete_sequence=px.colors.qualitative.Safe[6:-1:], pattern_shape_sequence=["x", "+", "\\"], 
              barmode="group", #text=[".1%<br><br> " for a in range(18)],
              hover_data=["Size","Material","Method"],
              title=f"Varying {varying} with " + criteria_to_str(criteria), 
@@ -380,7 +391,8 @@ config = customize_figure(fig, width=1100, height=300)
 fig.for_each_trace( lambda trace: trace.update(marker=dict(color="#000",opacity=0.33,pattern=dict(shape=""))) if trace.name == "None" else (), )
 
 fig.show(config=config)
-save_plotly_figure(fig, file_name=f"Across {varying}- " + criteria_to_str(criteria) )
+fig.update_layout(title=dict(text=""))
+save_plotly_figure(fig, file_name=f"Fig 5- Across {varying}- " + criteria_to_str(criteria) )
 
 
 # #### Glove method
@@ -401,7 +413,7 @@ fig = px.bar(df_sampled,
              color_discrete_sequence=px.colors.qualitative.D3, pattern_shape_sequence=["x", "+", "-"], 
              barmode="group", #text=[".1%<br><br> " for a in range(18)],
              hover_data=["Size","Material","Method","wd_rel.amin","wd_rel.median","wd_rel.amax"],
-             title=f"Varying {varying} with " + criteria_to_str(criteria), 
+             #title=f"Varying {varying} with " + criteria_to_str(criteria), 
              category_orders=category_orders, labels=labels, template="simple_white", 
              )
 
@@ -410,9 +422,9 @@ config = customize_figure(fig, width=1100, height=300)
 fig.for_each_trace( lambda trace: trace.update(marker=dict(color="#000",opacity=0.33,pattern=dict(shape=""))) if trace.name == "None" else (), )
 
 
-
 fig.show(config=config)
-save_plotly_figure(fig, file_name=f"Across {varying}- " + criteria_to_str(criteria) )
+fig.update_layout(title=dict(text=""))
+save_plotly_figure(fig, file_name=f"Fig 6- Across {varying}- " + criteria_to_str(criteria) )
 
 
 # Relative Obstruction of Field of View
@@ -452,11 +464,14 @@ config = customize_figure(fig, width=1100, height=300)
 for idx, trace in enumerate(fig["data"]):
     trace["name"] = trace["name"].split()[-1]
 
-fig.for_each_trace( lambda trace: trace.update(marker=dict(color="#000",opacity=0.33,pattern=dict(shape=""))) if trace.name == "None" else (), )
+#fig.for_each_trace( lambda trace: trace.update(marker=dict(color="#000",opacity=0.33,pattern=dict(shape=""))) if trace.name == "None" else (), )
+fig.for_each_trace( lambda trace: trace.update(marker=dict(color="#CCC",pattern=dict(shape=""))) if trace.name == "None" else (), )
 
+fig.update_traces(texttemplate=[None]+[""" <br><br><br><b>%{y:.1%}</b>"""]*5,)
 
 fig.show(config=config)
-save_plotly_figure(fig, file_name=f"Across {varying}- " + criteria_to_str(criteria) )
+
+save_plotly_figure(fig, file_name=f"Fig 7- Across {varying}- " + criteria_to_str(criteria) )
 
 
 # ## Plot vertical heights
@@ -485,6 +500,12 @@ colors={
 
 #[key for key in df_sampled["name_formatted"] if key not in colors.keys()]
 len(df_sampled["name_formatted"])
+
+
+# In[ ]:
+
+
+list(names.values())[0:-1:]
 
 
 # In[ ]:
@@ -523,19 +544,20 @@ names={
     "S-Nitrile-Glove-Middle-5": "<i>Small</i><br>Nitrile<br>Glove"
 }
 names={
+    "S-Nitrile-Glove-Palm":                 "<i>Small</i><br>Nitrile<br>Glove,<br><i>Palm</i>",
+    "M-Nitrile-Glove-Palm":                 "<i>Medium</i><br>Nitrile<br>Glove,<br><i>Palm</i>",
     "None-None-None-None":                  "None", #"None<br>(3 clicks)",
     "Unspecified-Durex-Condom-Precut":      "<i>Durex</i><br>Condom",
     "Unspecified-Lifestyle-Condom-Precut":  "<i>Lifestyle</i><br>Condom",
     "Unspecified-Skyn-Condom-Precut":       "<i>Skyn</i><br>Condom",
     "Unspecified-Trojan-Condom-Precut":     "<i>Trojan</i><br>Condom",
-    "M-Vinyl-Glove-Middle":                 "Medium<br><i>Vinyl</i><br>Glove",
     "L-Nitrile-Glove-Middle":               "<i>Large</i><br>Nitrile<br>Glove",
     "M-Nitrile-Glove-Middle":               "Medium<br>Nitrile<br>Glove",
-    "M-Nitrile-Glove-Two":                  "Medium<br>Nitrile<br>Glove,<br><i>2 fingers</i>",
     "S-Nitrile-Glove-Middle":               "<i>Small</i><br>Nitrile<br>Glove",
-    "S-Nitrile-Glove-Palm":                 "<i>Small</i><br>Nitrile<br>Glove,<br><i>Palm</i>",
-    "M-Nitrile-Glove-Palm":                 "<i>Medium</i><br>Nitrile<br>Glove,<br><i>Palm</i>",
+    "M-Nitrile-Glove-Two":                  "Medium<br>Nitrile<br>Glove,<br><i>2 fingers</i>",
+    "M-Vinyl-Glove-Middle":                 "Medium<br><i>Vinyl</i><br>Glove",
 }
+names = {key: value.replace("<i>","").replace("</i>","") for key, value in names.items()}
 colors={
     "None": "black",
     "<i>Durex</i><br>Condom": "blue",
@@ -551,23 +573,29 @@ colors={
     "<i>Medium</i><br>Nitrile<br>Glove,<br><i>Palm</i>": "orange",
 }
 df_sampled["name_formatted"] = df_sampled["name"].replace(names, value=None)  # values=None indicates that names has the values in it (i.e is a dict, not a list)
+df_sampled["colors"] = df_sampled["name_formatted"].replace(colors, value=None)
 #df_sampled["name"] = df_sampled["name_formatted"].replace(names)
 
 fig = px.bar(df_sampled, 
              #x = np.argsort(df_sampled["Vertical Height.mean"]),
              x = "name_formatted",
              y="Vertical Height.mean", error_y="Vertical Height.sem", 
-             category_orders={**category_orders, "name_formatted":list(names.values()).reverse() }, 
+             category_orders={**category_orders, }, 
              labels={**labels,"Spec Ang":"Number of Clicks Open", "Vertical Height.mean":"Initial Height of <br>Speculum Opening"}, 
              template="simple_white", 
              hover_data=["Size","Material","Method","name"], #color = ["gray","gray","red","gray","gray"]
-             color=colors, facet_col="Spec Ang", # facet_row="Material Type",
+             color="Material Type", 
+             facet_col="Spec Ang", # facet_row="Material Type",
              )
 fig.update_xaxes(matches=None)
 fig.update_traces(texttemplate=""" <br><b>%{y:.2f}<br>cm</b>""", textposition="outside",)
 
 fig.update_xaxes(linewidth=2, #showticklabels=False, nticks=0,
-                 title=dict(text="Speculum-Material Combination",font=dict(size=18, family="Arial Black")),
+                 title=dict(
+                     #text="Speculum-Material Combination",
+                     text="Speculum Sheath",
+                     font=dict(size=18, family="Arial Black")
+                     ),
                  )
 fig.update_yaxes(ticksuffix="cm", tickformat=".0f", tickwidth=2, range=(0,6),  nticks=6*2+1, ticklabelstep=2,
                 mirror=True, linewidth=2,
@@ -581,19 +609,22 @@ fig.update_layout(uniformtext_minsize=12, uniformtext_mode='hide')
 
 fig.update_layout(showlegend=False)
 
-fig.add_annotation(x=5, y=0.25,
-            text="<b>Failed: Broke speculum</b>",
+fig.add_annotation(x=4, y=0.25,
+            text="<b>Failed: <i>Broke speculum</i></b>",
             textangle=-90, xanchor="center", yanchor="bottom",
+            font=dict(color="#3976af"), bgcolor="white",  # 3976af is blue
+            showarrow=False,
+            row=1, col=2)
+fig.add_annotation(x=5, y=0.25,
+            text="<b><i>Failed: <i>Slipped off speculum</i></b>",
+            textangle=-90, xanchor="center", yanchor="bottom",
+            font=dict(color="#3976af"), bgcolor="white",
             showarrow=False,
             row=1, col=2)
 fig.add_annotation(x=6, y=0.25,
-            text="<b>Failed: Slipped off speculum</b>",
+            text="<b><i>Failed: <i>Slipped off speculum</i></b>",
             textangle=-90, xanchor="center", yanchor="bottom",
-            showarrow=False,
-            row=1, col=2)
-fig.add_annotation(x=7, y=0.25,
-            text="<b>Failed: Slipped off speculum</b>",
-            textangle=-90, xanchor="center", yanchor="bottom",
+            font=dict(color="#3976af"), bgcolor="white",
             showarrow=False,
             row=1, col=2)
 
@@ -602,10 +633,25 @@ fig.add_annotation(x=7, y=0.25,
 
 
 for index in range(2):
-    fig.layout.annotations[index]["text"] = f"<b>With {[3,5][index]} (of 7) Clicks Open</b>"
+    #fig.layout.annotations[index]["text"] = f"<b>With {[3,5][index]} (of 7) Clicks Open</b>"
+    fig.layout.annotations[index]["text"] = f"<b>With {[3,5][index]} Clicks of Angular Adjustment"
 
-config = customize_figure(fig, width=1100, height=500, by_mmHg=False)
+config = customize_figure(fig, width=1200, height=500, by_mmHg=False)
+
 
 fig.show(config=config)
-save_plotly_figure(fig, file_name=f"Vertical Height Bar Plot" )
+save_plotly_figure(fig, file_name=f"Fig 3- Vertical Height Bar Plot" )
+
+
+# In[ ]:
+
+
+#df_sampled[["name","name_formatted"]]
+df_sampled
+
+
+# In[ ]:
+
+
+
 

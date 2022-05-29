@@ -20,7 +20,7 @@ get_ipython().run_line_magic('pip', 'install plotly==5.7.0.    # need 5.7.0, not
 # ## Base imports
 # 
 
-# In[3]:
+# In[2]:
 
 
 import os
@@ -122,7 +122,7 @@ project_path_full = os.path.join("/content/",mountpoint_folder_name,
 get_ipython().run_line_magic('cd', '{project_path_full}')
 
 
-# In[6]:
+# In[9]:
 
 
 
@@ -147,7 +147,7 @@ except ModuleNotFoundError:  # in case not run in Google colab
 
 # # Skip ahead from loaded code
 
-# In[104]:
+# In[10]:
 
 
 speculum_df_raw = pd.read_pickle("data/02_intermediate/speculum_df_raw"+".pkl")
@@ -171,7 +171,7 @@ df_multiindex = pd.read_pickle("data/03_processed/combined_df_multiindex"+".pkl"
 
 # ## Setup dicts and helper functions
 
-# In[ ]:
+# In[6]:
 
 
 category_orders={"Size": ["S", "M", "L","Unspecified","None"],
@@ -207,7 +207,7 @@ def filter_by_criteria(criteria:dict, starting_df:pd.DataFrame) -> pd.DataFrame:
 
 # ## Setup  plotly
 
-# In[ ]:
+# In[7]:
 
 
 default_plotly_save_scale = 4
@@ -310,7 +310,9 @@ display(styled)
 
 # ## Test-Retest Reliability, ICC
 
-# In[57]:
+# ### Correlations
+
+# In[ ]:
 
 
 #df_long_wd_rel.index.levels[-1]
@@ -322,7 +324,7 @@ df_long_wd_rel = df_long.pivot(index=
 df_long_wd_rel.drop(0, level=-1)
 
 
-# In[60]:
+# In[ ]:
 
 
 #df_wide 
@@ -345,7 +347,23 @@ display( df_long_wd_rel.corr() )
 display( df_long_vh.corr() )
 
 
-# In[75]:
+# In[ ]:
+
+
+df = df_long_wd_rel
+df_long_wd_rel_corr = [df.corr().iloc[1,0], df.corr().iloc[2,0], df.corr().iloc[2,1]]
+display( np.mean( df_long_wd_rel_corr ) )
+
+df = df_long_vh
+df_long_vh_corr = [df.corr().iloc[1,0], df.corr().iloc[2,0], df.corr().iloc[2,1]]
+display( np.mean( df_long_vh_corr ) )
+
+
+# ### Library with Heise test-retest calculation
+
+# #### Install
+
+# In[ ]:
 
 
 # Package by Lily Eisner. Using v0.0.4. https://github.com/nimh-comppsych/data-reliability-stability/wiki/User-Guide
@@ -354,35 +372,97 @@ display( df_long_vh.corr() )
 get_ipython().run_line_magic('pip', 'install reliability-stability-calc==0.0.4')
 
 
-# In[74]:
+# #### Test
+
+# In[ ]:
 
 
-import reliability_stability
+import reliability_stability as rs
 
 # Pearson's correlation (test-retest reliability for 2 data points)
-display( reliability_stability.calc_correlation(df_long_wd_rel, ("wd_rel","1"), ("wd_rel","2")) )
+display( "Correlation", {"wd_rel": rs.calc_correlation(df_long_wd_rel, ("wd_rel","1"), ("wd_rel","2")), 
+         "Vertical Height": rs.calc_correlation(df_long_vh, ("Vertical Height","1"), ("Vertical Height","2"))} )
 # test retest reliability for 3 datapoints
-display( reliability_stability.calc_reliability(df_long_wd_rel, ("wd_rel","1"), ("wd_rel","2"), ("wd_rel","3")) )
+display( "ICC test retest reliability",{"wd_rel": rs.calc_reliability(df_long_wd_rel, ("wd_rel","1"), ("wd_rel","2"), ("wd_rel","3")),
+         "Vertical Height": rs.calc_reliability(df_long_vh, ("Vertical Height","1"), ("Vertical Height","2"), ("Vertical Height","3"))})
 
 
-# In[76]:
+# #### Display tables
+
+# In[ ]:
+
+
+df = df_long_wd_rel
+df_long_wd_rel_corr = [df.corr().iloc[1,0], df.corr().iloc[2,0], df.corr().iloc[2,1]]
+
+df = df_long_vh
+df_long_vh_corr = [df.corr().iloc[1,0], df.corr().iloc[2,0], df.corr().iloc[2,1]]
+
+import reliability_stability as rs
+
+df_trt = pd.DataFrame.from_dict( {
+    measurement_label: [ 
+                  "x".join([str(n) for n in df.shape]), 
+                  rs.calc_reliability(df[measurement], "1", "2", "3"), 
+                  *df_corr,
+                  np.mean(df_corr),
+                  ]
+    for (measurement_label,measurement), (df,df_corr) in {
+        ("Relative Width","wd_rel"):(df_long_wd_rel,df_long_wd_rel_corr), ("Vertical Height","Vertical Height"):(df_long_vh,df_long_vh_corr)
+        }.items()
+    }, 
+    #columns=["N", "Heise", "$R_1,2$", "R1,3", "R2,3", "mean R"],
+    columns=["N", "Heise", "R₁₂", "R₁₃", "R₂₃", "mean R"],
+    orient="index" )
+df_trt
+
+
+# In[ ]:
+
+
+import reliability_stability as rs
+
+df_trt = pd.DataFrame.from_dict( {
+    measurement_label: [ 
+                  "x".join([str(n) for n in df.shape]), # Display N, but separate out the trial count to "50x3" type format
+                  rs.calc_reliability(df[measurement], "1", "2", "3"),  # "1", "2", "3" are the column names
+                  df.corr().iloc[1,0], df.corr().iloc[2,0], df.corr().iloc[2,1],
+                  np.mean( [df.corr().iloc[1,0], df.corr().iloc[2,0], df.corr().iloc[2,1]] ),
+                  ]
+    for (measurement_label,measurement), df in {
+        ("Vertical Height","Vertical Height"): df_long_vh,
+        **{
+            ("Relative Width" + (f" at {mmHg}mmHg"  if type(mmHg)==int else " (all)"), "wd_rel"):
+             df_long_wd_rel.loc[pd.IndexSlice[:,:,:,:,:,:,:,mmHg]] 
+             for mmHg in [pd.IndexSlice[:], 40,80,120,160,200]},  # pd.IndexSlice[:] represents all category;  0 category not included because always the same ("relative")
+        }.items()
+    }, 
+    columns=["N", "Heise", "R₁₂", "R₁₃", "R₂₃", "mean R"],
+    orient="index" )
+styled = df_trt.style
+#styled = styled.set_caption("Heise test-retest reliability and Pearson correlation coefficients comparing the measurements between the three trials of each condition combination")
+#styled.to_excel(f"outputs/tables/test_retest_{styled.caption}.xlsx")
+styled = styled.set_caption("Heise test-retest reliability")
+styled.to_excel(f"outputs/tables/{styled.caption}.xlsx")
+df_trt.to_csv(  f"outputs/tables/{styled.caption}.csv", index=True) 
+styled
+
+
+# In[ ]:
+
+
+df_trt.index
+
+
+# ### pingouin library
+
+# In[ ]:
 
 
 get_ipython().run_line_magic('pip', 'install pingouin')
 
 
-# In[103]:
-
-
-df_long3 = df_long.copy()
-
-key_cols = ["Speculum Type","Spec Ang","Spec Ht","Size","Material","Material Type","Method"]
-#df_long3.drop_duplicates(subset=key_cols).reset_index().drop("index",axis=1).reset_index().rename({"index":"Set"},axis=1)
-set_info = df_long3[key_cols].drop_duplicates().reset_index().drop("index",axis=1).reset_index().rename({"index":"Set"},axis=1)
-with_set_info = set_info.merge(df_long3, how="outer",on=key_cols)
-
-
-# In[105]:
+# In[ ]:
 
 
 import pingouin as pg
@@ -536,6 +616,80 @@ display(anova_tables)
 
 
 # ## Models
+
+# In[36]:
+
+
+str(None)
+
+
+# In[60]:
+
+
+type(ols_result.predict(df_sampled))
+type(df_sampled["wd_rel"])
+
+pd.DataFrame([df_sampled["wd_rel"], ols_result.predict(df_sampled)])
+
+import plotly.express as px
+df = px.data.iris()
+fig = px.scatter(df, x="sepal_width", y="sepal_length", color="species",
+                 size='petal_length', hover_data=['petal_width'])
+fig.show()
+
+
+# In[53]:
+
+
+ols_result.params
+
+
+# In[79]:
+
+
+criteria = {"mmHg":[40,80,120,160,200], "Material":["Nitrile"]}
+df_sampled = df_long.loc[ np.all([ (type(val)!=list and df_long[arg]==val ) or np.in1d(df_long[arg],val)  for arg, val in criteria.items()], axis=0) ]
+#df_sampled.loc[:,"mmHg"] = df_sampled["mmHg"].astype(np.int64)
+df_sampled = df_sampled.astype({"mmHg": "int64"})
+
+y = "wd_rel"
+varying = "Size"
+
+model = smf.ols(f"{y} ~ mmHg + C(Q('{varying}'))", data=df_sampled)
+ols_result = model.fit()
+df_sampled["predicted"] = ols_result.predict(df_sampled)
+
+import plotly.express as px
+df = px.data.iris()
+fig = px.scatter(df_sampled, x="wd_rel", y="predicted", color="Size",
+                 size='mmHg', hover_data=['Material'], 
+                 #template="simple_white"
+                 )
+fig.update_layout(shapes = [{'type': 'line', 'yref': 'paper', 'xref': 'paper', 'y0': 0, 'y1': 1, 'x0': 0, 'x1': 1}])
+
+fig.update_layout(
+        #shapes = [{'type': 'line', 'yref': 'paper', 'xref': 'paper', 'y0': 0, 'y1': 1, 'x0': 0, 'x1': 1}],
+        width=500, height=500,
+    )
+
+fig.update_xaxes(tickformat=".0%", tickwidth=2,  nticks=21, ticklabelstep=4,
+                        mirror="ticks", linewidth=2, range=(0,1), 
+                        showgrid=True, gridcolor="#DDD", 
+                        showspikes=True, spikemode="across", spikethickness=2, spikedash="solid", # ticklabelposition="inside top",
+                        )
+fig.update_yaxes(tickformat=".0%", tickwidth=2,  nticks=21, ticklabelstep=4,
+                        mirror="ticks", linewidth=2, range=(0,1), 
+                        showgrid=True, gridcolor="#DDD", 
+                        showspikes=True, spikemode="across", spikethickness=2, spikedash="solid", # ticklabelposition="inside top",
+                        )
+fig.show()
+
+
+# In[82]:
+
+
+df_sampled
+
 
 # In[ ]:
 
