@@ -5,7 +5,7 @@
 
 # ## Pip install
 
-# In[ ]:
+# In[3]:
 
 
 # Don't forget to restart runtime after installing
@@ -21,7 +21,7 @@ get_ipython().run_line_magic('pip', 'install plotly==5.7.0.    # need 5.7.0, not
 # ## Base imports
 # 
 
-# In[ ]:
+# In[4]:
 
 
 import os
@@ -42,7 +42,7 @@ import PIL
 import PIL.Image
 import requests
 
-import labelbox
+#import labelbox
 #from labelbox.data.annotation_types import Geometry
 
 import IPython.display
@@ -52,7 +52,7 @@ import plotly
 import plotly.express as px
 
 
-# In[ ]:
+# In[5]:
 
 
 
@@ -111,11 +111,12 @@ def get_path_to_save(plot_props:dict=None, file_prefix="", save_filename:str=Non
 
     if not os.path.exists(save_path) and create_folder_if_necessary:
         os.makedirs(save_path)
+    print(os.path.join(save_path, file_prefix+save_filename+"."+extension))
     return os.path.join(save_path, file_prefix+save_filename+"."+extension)
     #plt.savefig(os.path.join(save_path, save_filename+"."+extension))
 
 
-# In[ ]:
+# In[6]:
 
 
 #@title ## Mount google drive and import my code
@@ -129,7 +130,7 @@ project_path_full = os.path.join("/content/",mountpoint_folder_name,
 get_ipython().run_line_magic('cd', '{project_path_full}')
 
 
-# In[ ]:
+# In[6]:
 
 
 
@@ -154,7 +155,7 @@ except ModuleNotFoundError:  # in case not run in Google colab
 
 # # Skip ahead from loaded code
 
-# In[ ]:
+# In[7]:
 
 
 speculum_df_raw = pd.read_pickle("data/02_intermediate/speculum_df_raw"+".pkl")
@@ -178,7 +179,7 @@ df_multiindex = pd.read_pickle("data/03_processed/combined_df_multiindex"+".pkl"
 
 # ## Setup dicts and helper functions
 
-# In[ ]:
+# In[8]:
 
 
 category_orders={"Size": ["S", "M", "L","Unspecified","None"],
@@ -214,7 +215,7 @@ def filter_by_criteria(criteria:dict, starting_df:pd.DataFrame) -> pd.DataFrame:
 
 # ## Setup  plotly
 
-# In[ ]:
+# In[9]:
 
 
 default_plotly_save_scale = 4
@@ -256,13 +257,11 @@ def save_plotly_figure(fig, file_name:str, animated=False, scale=None, save_in_s
 
 # ##### Define image plotting function
 
-# In[ ]:
+# In[18]:
 
 
-def plot_combined_images(order_current, label_dict, df_long=df_long, do_save=True, do_print=False, dpi=None):
+def plot_combined_images(order_current, label_dict, df_long=df_long, nrows=2, ncols=3, do_save=True, do_print=False, dpi=None, annotate_extra_info=True):
     # default dpi is 72
-    nrows = 2
-    ncols = 3
     filenames= list(df_long[df_long["Order"]==order_current].Filename)  # list converts form pd.Series
     if len(filenames)==0:
         return None
@@ -331,10 +330,11 @@ def plot_combined_images(order_current, label_dict, df_long=df_long, do_save=Tru
         image_np = np.rot90(image_np, k=(1 if data_row['Material Type']=="Glove" else 0) )
 
         axes.flat[ind].imshow(image_np)
-        #axes.flat[ind].text( image_np.shape[0]*0.02, image_np.shape[0]*0.02, filename, color="blue", fontsize=6, ha='left',va="top")
-        axes.flat[ind].text( image_np.shape[0]*0.02, image_np.shape[0]*0.95, filename, color="blue", fontsize=6, ha='left',va="top",
-                            bbox=dict(boxstyle="square", ec=(0.5, 0.5, 0.5),fc=(0.8, 0.8, 0.8, 0.6),
-                                      ))
+        if annotate_extra_info:
+            #axes.flat[ind].text( image_np.shape[0]*0.02, image_np.shape[0]*0.02, filename, color="blue", fontsize=6, ha='left',va="top")
+            axes.flat[ind].text( image_np.shape[0]*0.02, image_np.shape[0]*0.95, filename, color="blue", fontsize=6, ha='left',va="top",
+                                bbox=dict(boxstyle="square", ec=(0.5, 0.5, 0.5),fc=(0.8, 0.8, 0.8, 0.6),
+                                        ))
         #axes.flat[ind].text( image_np.shape[0]*0.02, image_np.shape[0]*0.98,  "\n".join(data_row_elem_str), color="blue", fontsize=5, ha='left',va="bottom")
         # Note, the x-y nomenclature is confusing because of the 90 deg rotation
         axes.flat[ind].set_xlabel(f"Δx = {box_size['y']:.0f}px",fontsize=8)
@@ -376,6 +376,70 @@ def plot_combined_images(order_current, label_dict, df_long=df_long, do_save=Tru
 
 # ##### Plot the images
 
+# In[13]:
+
+
+get_ipython().run_line_magic('pip', 'install "labelbox[data]" --quiet')
+
+
+# In[14]:
+
+
+import labelbox
+
+# Add your labelbox api key and project
+# Labelbox API stored in separate file since it is specific for a labelbox 
+#account and shouldn't be committed to git. Contact the 
+# team (i.e. Rahul Yerrabelli) in order to access to the data on your own account.
+with open("auth/LABELBOX_API_KEY.json", "r") as infile:
+  json_data = json.load(infile)
+API_KEY = json_data["API_KEY"]
+del json_data   # delete sensitive info
+
+PROJECT_ID = "cl2cept1u4ees0zbx6uan5kwa"
+DATASET_ID_Glove = "cl2cerkwd5gtd0zcahfz98401"; DATASET_NAME_Glove = "SpeculumWithGlove"
+DATASET_ID_Condom = "cl2hu1u8z019a0z823yl5f8gr"; DATASET_NAME_Condom = "SpeculumWithCondom"
+
+client = labelbox.Client(api_key=API_KEY)
+del API_KEY   # delete sensitive info
+project = client.get_project(PROJECT_ID)
+dataset_glove = client.get_dataset(DATASET_ID_Glove)
+dataset_condom = client.get_dataset(DATASET_ID_Condom)
+# Alternative way to get dataset
+# dataset = next(client.get_datasets(where=(labelbox.Dataset.name == DATASET_NAME)))
+
+# Below code is from labelbox tutorial
+# Create a mapping for the colors
+hex_to_rgb = lambda hex_color: tuple(
+    int(hex_color[i + 1:i + 3], 16) for i in (0, 2, 4))
+colors = {
+    tool.name: hex_to_rgb(tool.color)
+    for tool in labelbox.OntologyBuilder.from_project(project).tools
+}
+
+
+# In[15]:
+
+
+image_labels = project.label_generator()
+image_labels = image_labels.as_list()
+labels_df = pd.DataFrame([[
+                           label.data.external_id, 
+                           label.annotations[0].value.end.x - label.annotations[0].value.start.x, 
+                           label.annotations[0].value.end.y - label.annotations[0].value.start.y, 
+                           label.annotations[0].value.start.x, 
+                           label.annotations[0].value.start.y, 
+                           label.data.url, 
+                           label.uid
+                           ] 
+                          for label in image_labels],
+                         columns=["Filename","x","y", "xstart","ystart","url", "Label ID"])
+
+label_from_id_dict = {label.data.external_id: label for label in image_labels}
+#with open("data/02_intermediate/label_from_id_dict"+".json", "w") as outfile:
+#    json.dump(label_from_id_dict, outfile)   # Error: Object of type Label is not JSON serializable 
+
+
 # In[ ]:
 
 
@@ -390,6 +454,152 @@ label_dict = {label.data.external_id: label for label in image_labels}
 # condom category starts at order=22
 #for order_current in range(22, df_long["Order"].max()+1):
 #    plot_combined_images(order_current=order_current, label_dict=label_from_id_dict, do_print=True, dpi=150)
+
+
+# In[20]:
+
+
+order_current = 1
+plot_combined_images(order_current=order_current, label_dict=label_from_id_dict, nrows=1, ncols=6, do_print=True, dpi=150, annotate_extra_info=True)
+
+
+# ### Matplotlib updated (old)
+
+# In[ ]:
+
+
+def plot_combined_images2(order_current, df_long=df_long, do_save=True, do_print=False, dpi=None, annotate_extra_info=True):
+    if order_current is None:
+        order_current=0
+        #order_current=order_current+1
+
+    df_sampled = df_long.loc[df_long.Order==order_current]
+    while df_sampled.shape[0]==0:  # skip ahead for empty order_currents
+        return False
+        #order_current=order_current+1 if order_current < df_long.Order.max() else 0
+        #df_sampled = df_long.loc[df_long.Order==order_current]
+
+    data_row = df_sampled.iloc[0] # get first row
+    base_row = df_sampled.loc[df_sampled.mmHg==0].squeeze()
+
+    base_folder = os.path.join("data/01_raw/photos/", ("glove" if data_row["Material Type"]=="Glove" else "condom/orig"))
+    images = np.array([skimage.io.imread( os.path.join(base_folder, filename))  for filename in df_sampled.Filename])
+    # rotate
+    # images = np.rot90(images, k=1, axes=(1,2))
+    dim = images.shape[1:]  # should be 3 values, with the last being color dim
+
+
+    # default dpi is 72
+    nrows = 1
+    ncols = 6
+    filenames= list(df_long[df_long["Order"]==order_current].Filename)  # list converts form pd.Series
+    if len(filenames)==0:
+        return None
+    else:
+        assert len(filenames) == 6, f"For order_current={order_current}, the len(filenames)=={len(filenames)}, when it should be 6. filenames={filenames}"
+
+
+    plt.rcParams['text.usetex'] = False   # for Latex
+    fig = plt.figure(figsize=(6,8), dpi=dpi)   #figsize=(16,12)  # wd,ht in in
+    axes = fig.subplots(nrows=nrows, ncols=ncols, 
+                        sharey=True, sharex=True
+                        )
+
+    data_rows = {}
+    for ind in range(nrows*ncols):
+        label = label_dict[filenames[ind]]
+        filename = label.data.external_id
+        box_size = {"x":label.annotations[0].value.end.x - label.annotations[0].value.start.x,  "y":label.annotations[0].value.end.y - label.annotations[0].value.start.y}
+        annotations = label.annotations
+        # image_np.shape is (2268, 4032, 3)  
+        # This is a 16:9 (x252) aspect ratio
+        # 4032 = 2^6 x 3^2 x 7
+        # 2268 = 2^2 x 3^4 x 7
+        image_np = label.data.value   
+
+
+        data_row = df_long.loc[df_long["Filename"]==filename].squeeze()  # squeeze removes the additional index dimension to make a 1D pandas series 
+        data_rows[data_row['Order']] = data_row
+        if data_row['Material Type'] == "Glove":
+            data_row_str = [
+                            f"'{data_row['Method']} finger' method" ,
+                            f"with {data_row['Size']}. {data_row['Material'].lower()} glove," " " f"Trial #{data_row['Trial']}"
+                            ]
+            data_row_elem_str = [
+                            f"'{data_row['Method']} finger' method" " " f"at {data_row['mmHg']}mmHg",
+                            f"with {data_row['Size']}. {data_row['Material'].lower()} glove," " " f"Trial #{data_row['Trial']}"
+                            ]
+        elif data_row['Material Type'] == "Condom":
+            data_row_str = [f"{data_row['Material']} brand condom," " " f"Trial #{data_row['Trial']}"
+                            ]
+            data_row_elem_str = [
+                            f"{data_row['Material']} brand condom" " " f"at {data_row['mmHg']}mmHg," " " f"Trial #{data_row['Trial']}"
+                            ]
+        elif data_row['Material Type'] == "None":
+            data_row_str = [f"No material," " " f"Trial #{data_row['Trial']}"
+                            ]
+            data_row_elem_str = [
+                            f"No material" " " f"at {data_row['mmHg']}mmHg," " " f"Trial #{data_row['Trial']}"
+                            ]
+        else:
+            assert False
+
+        if do_print:
+            print(filename + "\t " + " ".join(data_row_elem_str))
+
+        # Draw the annotations onto the source image
+        for annotation in annotations:
+            if isinstance(annotation.value, labelbox.data.annotation_types.Geometry):
+                image_np = annotation.value.draw(canvas=image_np,
+                                                color=colors[annotation.name],
+                                                thickness=10)
+
+
+        image_np = np.rot90(image_np, k=(1 if data_row['Material Type']=="Glove" else 0) )
+
+        axes.flat[ind].imshow(image_np)
+        if annotate_extra_info:
+            #axes.flat[ind].text( image_np.shape[0]*0.02, image_np.shape[0]*0.02, filename, color="blue", fontsize=6, ha='left',va="top")
+            axes.flat[ind].text( image_np.shape[0]*0.02, image_np.shape[0]*0.95, filename, color="blue", fontsize=6, ha='left',va="top",
+                                bbox=dict(boxstyle="square", ec=(0.5, 0.5, 0.5),fc=(0.8, 0.8, 0.8, 0.6),
+                                        ))
+        #axes.flat[ind].text( image_np.shape[0]*0.02, image_np.shape[0]*0.98,  "\n".join(data_row_elem_str), color="blue", fontsize=5, ha='left',va="bottom")
+        # Note, the x-y nomenclature is confusing because of the 90 deg rotation
+        axes.flat[ind].set_xlabel(f"Δx = {box_size['y']:.0f}px",fontsize=8)
+        #axes.flat[ind].set_ylabel(f"Δy = {box_size['x']:.0f}px",fontsize=8)
+        axes.flat[ind].set_title(f"At {data_row['mmHg']}mmHg", fontsize=10,fontweight="bold")
+
+
+    for ind,ax in enumerate(axes.flat):
+        ax.grid(which="major", alpha=0.75)  # set major grid lines
+        ax.grid(which="minor", alpha=0.5, linestyle=":")  # set minor grid lines, but make them less visible
+        ax.xaxis.set_minor_locator(matplotlib.ticker.AutoMinorLocator())
+        ax.yaxis.set_minor_locator(matplotlib.ticker.AutoMinorLocator())
+
+    fig.suptitle("Speculum Image Data", fontsize=20, fontweight="bold")
+    fig.suptitle(" ".join(data_row_str),
+            fontsize=12,
+            fontweight="bold")
+
+    plt.tight_layout(rect=[0,0.05,1,0.95]) # rect=[left, bottom, right top]
+
+    """
+    data_rows_df = pd.DataFrame(data_rows)
+    col_names = ["Order","Size", "Material", "Method", "Trial"]
+    common_args = []
+    for col_name in col_names:
+        if (data_rows_df[col_name].iloc[0]==data_rows_df[col_name]).all():
+            common_args.append(col_name + "=" + str(data_rows_df[col_name].iloc[0]))
+    #(data_rows_df["Size"].iloc[0]==data_rows_df["Size"]).all()
+    print()"""
+
+
+    if do_save:
+        dpi = fig.dpi
+        data_row_str_clean = " ".join(data_row_str)
+        data_row_str_clean = data_row_str_clean.replace("#","".replace(".",""))
+        plt.savefig(get_path_to_save(save_filename=f"Trial {order_current}) " + " ".join(data_row_str) + f", dpi={dpi}", save_in_subfolder="Each Trial - Matplotlib"), 
+                    bbox_inches='tight')  # Include the bbox_inches='tight' is critical to ensure the saved images aren't cutoff while the colab images are normal
 
 
 # ### Plotly plots (new)
@@ -433,13 +643,7 @@ with PIL.Image.open(f'data/01_raw/photos/glove/{filename}') as image_orig:
 
 # #### Plotting trial images - subplots
 
-# In[ ]:
-
-
-5 // 2
-
-
-# In[ ]:
+# In[14]:
 
 
 # figure size in px
@@ -458,7 +662,7 @@ else:
 #col_options = {col_name:pd.unique(df_long[col_name]).tolist() for col_name in consistent_cols}
 #display(col_options)
 
-def plot_combined_images_plotly(order_current, df_long=df_long, do_save=True, save_scale=None, save_extensions=None, n=None):
+def plot_combined_images_plotly(order_current, df_long=df_long, do_save=True, save_scale=None, save_extensions=None, n=None, annotate_extra_info=True):
     if order_current is None:
         order_current=0
         #order_current=order_current+1
@@ -553,7 +757,7 @@ def plot_combined_images_plotly(order_current, df_long=df_long, do_save=True, sa
                                 bgcolor="rgba(255,255,255,0.4)",
                                 ),
             ),
-        fig.layout.annotations[index]["text"] = f"<b>At {data_row.mmHg}mmHg</b>"
+        fig.layout.annotations[index]["text"] = f"<b>{data_row.mmHg}mmHg</b>"
         #fig.layout.annotations[index]["text"] = f"View Width: {data_row.wd:.0f}px ({data_row.wd/base_row.wd:.1%})"
         #fig.update_xaxes(title=f"At {data_row.mmHg}mmHg", row=ind_to_row(index), col=ind_to_col(index))
 
@@ -561,16 +765,17 @@ def plot_combined_images_plotly(order_current, df_long=df_long, do_save=True, sa
 
 
     # Add filename and other info annotation
-    for index, (index_of_all, data_row) in enumerate(df_sampled.iterrows()):
-        fig.add_annotation(
-            x=1, y=1,
-            xref="paper", yref="paper",
-            text="<br>".join(data_row_elem_str) + "<br>Filename: " + data_row.Filename + "<br>Size: " + str(dim[0]) + "x" + str(dim[1]) + "px" + ("" if n==1 else f" (reduced {n}x to display here)"),
-            xanchor="left", yanchor="bottom", align="left", # align only matters if multiline. 'anchor' arguments actually change the position within the graph
-            font=dict(size=10, color="blue",family="Courier"),
-            row=ind_to_row(index), col=ind_to_col(index),
-            showarrow=False, 
-            )
+    if annotate_extra_info:
+        for index, (index_of_all, data_row) in enumerate(df_sampled.iterrows()):
+            fig.add_annotation(
+                x=1, y=1,
+                xref="paper", yref="paper",
+                text="<br>".join(data_row_elem_str) + "<br>Filename: " + data_row.Filename + "<br>Size: " + str(dim[0]) + "x" + str(dim[1]) + "px" + ("" if n==1 else f" (reduced {n}x to display here)"),
+                xanchor="left", yanchor="bottom", align="left", # align only matters if multiline. 'anchor' arguments actually change the position within the graph
+                font=dict(size=10, color="blue",family="Courier"),
+                row=ind_to_row(index), col=ind_to_col(index),
+                showarrow=False, 
+                )
         
         
 
@@ -621,7 +826,7 @@ def plot_combined_images_plotly(order_current, df_long=df_long, do_save=True, sa
     fig.show()
 
     if do_save:
-        save_plotly_figure(fig, file_name=f"Trial {order_current}) {' '.join(data_row_str)}", save_in_subfolder="Each Trial - Plotly", 
+        save_plotly_figure(fig, file_name=f"Trial {order_current}) {' '.join(data_row_str)}, n={n}", save_in_subfolder="Each Trial - Plotly", 
                            scale=save_scale, extensions=save_extensions )
 
 
@@ -632,6 +837,13 @@ def plot_combined_images_plotly(order_current, df_long=df_long, do_save=True, sa
 for order_current in range(1,df_long["Order"].max()+1):
     print(order_current)
     plot_combined_images_plotly(order_current=order_current, save_extensions=["html","jpg","pdf"], n=10 )
+
+
+# In[18]:
+
+
+plot_combined_images_plotly(order_current=1, save_extensions=["jpg"], n=5, annotate_extra_info=False)
+#plot_combined_images_plotly(order_current=1, save_extensions=["svg"], n=4, annotate_extra_info=False)
 
 
 # ## Plot Individual trial level data

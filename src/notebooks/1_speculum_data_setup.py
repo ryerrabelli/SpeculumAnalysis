@@ -5,7 +5,7 @@
 
 # ## Pip install
 
-# In[ ]:
+# In[1]:
 
 
 # Don't forget to restart runtime after installing
@@ -112,7 +112,7 @@ def get_path_to_save(plot_props:dict=None, file_prefix="", save_filename:str=Non
     #plt.savefig(os.path.join(save_path, save_filename+"."+extension))
 
 
-# In[6]:
+# In[4]:
 
 
 #@title ## Mount google drive and import my code
@@ -228,7 +228,7 @@ label_from_id_dict = {label.data.external_id: label for label in image_labels}
 
 # #### Option 2: Read from labelbox csv if already saved there from previous run
 
-# In[32]:
+# In[ ]:
 
 
 labels_df = pd.read_csv("data/02_intermediate/labels_df.csv", index_col=0)
@@ -238,7 +238,7 @@ labels_df = pd.read_csv("data/02_intermediate/labels_df.csv", index_col=0)
 
 # ### Read trial data from saved excel sheet
 
-# In[31]:
+# In[ ]:
 
 
 def handle_vertical_ht(x):
@@ -273,7 +273,7 @@ speculum_df_notfailed.to_pickle("data/02_intermediate/speculum_df_notfailed"+".p
 
 # ### Combine labelbox and excel sheet, calculate relative value
 
-# In[33]:
+# In[ ]:
 
 
 df_long=pd.merge(left=speculum_df_notfailed, right=labels_df, on="Filename")
@@ -303,7 +303,7 @@ for ind in df_long["Order"].unique():
 
 # ### Get wide form
 
-# In[34]:
+# In[ ]:
 
 
 df_wide = df_long.pivot(index=
@@ -315,7 +315,7 @@ df_wide_flat.columns = [".".join([str(item) for item in col]).strip(".") for col
 
 # ### Order by set and the mmHg within that set (multiindex)
 
-# In[35]:
+# In[ ]:
 
 
 df_multiindex = df_long.set_index(["Order","mmHg"])
@@ -324,7 +324,7 @@ df_multiindex
 
 # ### Save processed dfs
 
-# In[36]:
+# In[ ]:
 
 
 df_long.to_csv(  "data/03_processed/combined_df_long"+".csv")
@@ -345,7 +345,7 @@ df_multiindex.to_pickle("data/03_processed/combined_df_multiindex"+".pkl")
 
 # ## Get aggregate df across trials
 
-# In[37]:
+# In[ ]:
 
 
 # Group by all the parameters that will be the same across different trials of the same object
