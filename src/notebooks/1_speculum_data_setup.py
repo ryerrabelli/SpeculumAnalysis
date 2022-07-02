@@ -49,7 +49,7 @@ import plotly
 import plotly.express as px
 
 
-# In[3]:
+# In[46]:
 
 
 
@@ -62,7 +62,7 @@ get_ipython().events.register('pre_run_cell', resize_colab_cell)
 
 
 #@markdown ### func `def get_path_to_save(...):`
-def get_path_to_save(plot_props:dict=None, file_prefix="", save_filename:str=None, save_in_subfolder:str=None, extension="jpg", create_folder_if_necessary=True):
+def get_path_to_save(plot_props:dict=None, file_prefix="", save_filename:str=None, save_in_subfolder:str=None, extension="jpg", dot=".", create_folder_if_necessary=True):
     """
     Code created myself (Rahul Yerrabelli)
     """
@@ -108,11 +108,11 @@ def get_path_to_save(plot_props:dict=None, file_prefix="", save_filename:str=Non
 
     if not os.path.exists(save_path) and create_folder_if_necessary:
         os.makedirs(save_path)
-    return os.path.join(save_path, file_prefix+save_filename+"."+extension)
-    #plt.savefig(os.path.join(save_path, save_filename+"."+extension))
+    return os.path.join(save_path, file_prefix+save_filename+dot+extension)
+    #plt.savefig(os.path.join(save_path, save_filename+dot+extension))
 
 
-# In[4]:
+# In[8]:
 
 
 #@title ## Mount google drive and import my code
@@ -126,7 +126,7 @@ project_path_full = os.path.join("/content/",mountpoint_folder_name,
 get_ipython().run_line_magic('cd', '{project_path_full}')
 
 
-# In[5]:
+# In[6]:
 
 
 
@@ -160,7 +160,7 @@ except ModuleNotFoundError:  # in case not run in Google colab
 # ##### Set up labelbox connection
 # Works with LabelBox api (https://labelbox.com/), which is the tool I used to label all the distances on the images.
 
-# In[ ]:
+# In[11]:
 
 
 # Add your labelbox api key and project
@@ -192,6 +192,67 @@ colors = {
     tool.name: hex_to_rgb(tool.color)
     for tool in labelbox.OntologyBuilder.from_project(project).tools
 }
+
+
+# #### Save mask images 
+
+# In[94]:
+
+
+# Export labels created in the selected date range as a json-type (list of dicts/elements/lists):
+labels2 = project.export_labels(download = True, start="2022-04-01", end="2022-06-01")
+
+
+# In[153]:
+
+
+labels3 = [value.copy() for value in labels2 ] # copy at least one level deep
+
+
+# In[154]:
+
+
+for ind in range(len(labels3)):
+    # Simplify "Label" and "Reviews" by removing unnecessary variables and making the necessary ones at the top level
+    # Thus, labels3 will be only 2 layers deep.
+    if "Label" in labels3[ind]:
+        coords = labels3[ind]["Label"]["objects"][0]["bbox"]
+        for key, val in coords.items():
+            labels3[ind]["Label"+"-"+key] = val
+        # URL to download mask. Still has token in it
+        labels3[ind]["Label_url"] = labels3[ind]["Label"]["objects"][0]["instanceURI"] 
+        del labels3[ind]["Label"]
+
+    # Remove special info ie emails, tokens (except the Label_url for now)
+    labels3[ind].pop("Labeled Data", None)  # url with token in it
+    labels3[ind].pop("View Label", None)  # url
+    labels3[ind].pop("Created By", None)  # has email address
+    labels3[ind].pop("Reviews", None)  # empty list
+
+
+# In[142]:
+
+
+# Download images from URLs
+import urllib.request
+
+for ind in range(len(labels3)):
+    filename = labels3[ind]["External ID"].split(".jpg")[0] + "_label"
+    filepath = get_path_to_save(save_filename=filename, extension="png")
+    urllib.request.urlretrieve(labels3[ind]["Label_url"], filepath)
+
+
+# In[155]:
+
+
+# Remove Label_url as that URL has the Labelbox token in it
+labelbox_df = pd.DataFrame.from_dict(labels3).set_index("External ID").drop(columns=["Label_url"])
+
+
+# In[156]:
+
+
+labelbox_df.to_csv( get_path_to_save(save_filename="labelbox_details", extension="csv") )
 
 
 # ##### Get dataframe now that labelbox is set up

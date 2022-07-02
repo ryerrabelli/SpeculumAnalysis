@@ -14296,9 +14296,8 @@ a.anchor-link {
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>     |████████████████████████████████| 167 kB 7.6 MB/s 
-     |████████████████████████████████| 11.1 MB 330 kB/s 
-     |████████████████████████████████| 6.3 MB 20.2 MB/s 
+<pre>     |████████████████████████████████| 168 kB 8.7 MB/s 
+     |████████████████████████████████| 6.3 MB 36.2 MB/s 
   Building wheel for pygeotile (setup.py) ... done
 </pre>
 </div>
@@ -14387,10 +14386,10 @@ a.anchor-link {
 
 </div>
 
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[3]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[46]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-python"><pre><span></span><span class="n">notebook_filename</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;http://172.28.0.2:9000/api/sessions&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
@@ -14402,7 +14401,7 @@ a.anchor-link {
 
 
 <span class="c1">#@markdown ### func `def get_path_to_save(...):`</span>
-<span class="k">def</span> <span class="nf">get_path_to_save</span><span class="p">(</span><span class="n">plot_props</span><span class="p">:</span><span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">save_filename</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_in_subfolder</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="s2">&quot;jpg&quot;</span><span class="p">,</span> <span class="n">create_folder_if_necessary</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">get_path_to_save</span><span class="p">(</span><span class="n">plot_props</span><span class="p">:</span><span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">save_filename</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_in_subfolder</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="s2">&quot;jpg&quot;</span><span class="p">,</span> <span class="n">dot</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">create_folder_if_necessary</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Code created myself (Rahul Yerrabelli)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -14448,8 +14447,8 @@ a.anchor-link {
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span> <span class="ow">and</span> <span class="n">create_folder_if_necessary</span><span class="p">:</span>
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="n">file_prefix</span><span class="o">+</span><span class="n">save_filename</span><span class="o">+</span><span class="s2">&quot;.&quot;</span><span class="o">+</span><span class="n">extension</span><span class="p">)</span>
-    <span class="c1">#plt.savefig(os.path.join(save_path, save_filename+&quot;.&quot;+extension))</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="n">file_prefix</span><span class="o">+</span><span class="n">save_filename</span><span class="o">+</span><span class="n">dot</span><span class="o">+</span><span class="n">extension</span><span class="p">)</span>
+    <span class="c1">#plt.savefig(os.path.join(save_path, save_filename+dot+extension))</span>
 </pre></div>
 
      </div>
@@ -14457,10 +14456,36 @@ a.anchor-link {
 </div>
 </div>
 
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+
+
+<div id="42a55151-876e-4783-a350-6703df9c33e3" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<script type="text/javascript">
+var element = document.getElementById('42a55151-876e-4783-a350-6703df9c33e3');
+google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
+</script>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[8]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-python"><pre><span></span><span class="c1">#@title ## Mount google drive and import my code</span>
@@ -14492,9 +14517,9 @@ a.anchor-link {
 
 
 
-<div id="760f713b-e1a6-4e91-9ed7-276733f1958d" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="42a55151-876e-4783-a350-6703df9c33e3" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('760f713b-e1a6-4e91-9ed7-276733f1958d');
+var element = document.getElementById('42a55151-876e-4783-a350-6703df9c33e3');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -14508,8 +14533,7 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>[Errno 2] No such file or directory: &#39;/content/drive/MyDrive/PythonProjects/SpeculumAnalysis&#39;
-/content
+<pre>/content/drive/MyDrive/Computer Backups/Rahul Yerrabelli drive/PythonProjects/SpeculumAnalysis
 </pre>
 </div>
 </div>
@@ -14521,7 +14545,7 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-python"><pre><span></span><span class="k">try</span><span class="p">:</span>
@@ -14561,9 +14585,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="760f713b-e1a6-4e91-9ed7-276733f1958d" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="42a55151-876e-4783-a350-6703df9c33e3" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('760f713b-e1a6-4e91-9ed7-276733f1958d');
+var element = document.getElementById('42a55151-876e-4783-a350-6703df9c33e3');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -14579,7 +14603,7 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
 <pre>/root
 Mounted at /content/drive
-/content/drive/.shortcut-targets-by-id/1okL5s1HTQUWqKodPSVNP_RsK0o81IH5E/PythonProjects/SpeculumAnalysis
+/content/drive/MyDrive/Computer Backups/Rahul Yerrabelli drive/PythonProjects/SpeculumAnalysis
 </pre>
 </div>
 </div>
@@ -14617,7 +14641,7 @@ Mounted at /content/drive
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[11]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-python"><pre><span></span><span class="c1"># Add your labelbox api key and project</span>
@@ -14669,9 +14693,379 @@ Mounted at /content/drive
 
 
 
-<div id="760f713b-e1a6-4e91-9ed7-276733f1958d" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="42a55151-876e-4783-a350-6703df9c33e3" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('760f713b-e1a6-4e91-9ed7-276733f1958d');
+var element = document.getElementById('42a55151-876e-4783-a350-6703df9c33e3');
+google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
+</script>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h4 id="Save-mask-images">Save mask images<a class="anchor-link" href="#Save-mask-images">&#182;</a></h4>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[94]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-python"><pre><span></span><span class="c1"># Export labels created in the selected date range as a json-type (list of dicts/elements/lists):</span>
+<span class="n">labels2</span> <span class="o">=</span> <span class="n">project</span><span class="o">.</span><span class="n">export_labels</span><span class="p">(</span><span class="n">download</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2022-04-01&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2022-06-01&quot;</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+
+
+<div id="42a55151-876e-4783-a350-6703df9c33e3" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<script type="text/javascript">
+var element = document.getElementById('42a55151-876e-4783-a350-6703df9c33e3');
+google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
+</script>
+</div>
+
+</div>
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+
+
+<div id="42a55151-876e-4783-a350-6703df9c33e3" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<script type="text/javascript">
+var element = document.getElementById('42a55151-876e-4783-a350-6703df9c33e3');
+google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
+</script>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[153]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-python"><pre><span></span><span class="n">labels3</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">labels2</span> <span class="p">]</span> <span class="c1"># copy at least one level deep</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+
+
+<div id="42a55151-876e-4783-a350-6703df9c33e3" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<script type="text/javascript">
+var element = document.getElementById('42a55151-876e-4783-a350-6703df9c33e3');
+google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
+</script>
+</div>
+
+</div>
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+
+
+<div id="42a55151-876e-4783-a350-6703df9c33e3" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<script type="text/javascript">
+var element = document.getElementById('42a55151-876e-4783-a350-6703df9c33e3');
+google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
+</script>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[154]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-python"><pre><span></span><span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">labels3</span><span class="p">)):</span>
+    <span class="c1"># Simplify &quot;Label&quot; and &quot;Reviews&quot; by removing unnecessary variables and making the necessary ones at the top level</span>
+    <span class="c1"># Thus, labels3 will be only 2 layers deep.</span>
+    <span class="k">if</span> <span class="s2">&quot;Label&quot;</span> <span class="ow">in</span> <span class="n">labels3</span><span class="p">[</span><span class="n">ind</span><span class="p">]:</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">labels3</span><span class="p">[</span><span class="n">ind</span><span class="p">][</span><span class="s2">&quot;Label&quot;</span><span class="p">][</span><span class="s2">&quot;objects&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;bbox&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">coords</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">labels3</span><span class="p">[</span><span class="n">ind</span><span class="p">][</span><span class="s2">&quot;Label&quot;</span><span class="o">+</span><span class="s2">&quot;-&quot;</span><span class="o">+</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="c1"># URL to download mask. Still has token in it</span>
+        <span class="n">labels3</span><span class="p">[</span><span class="n">ind</span><span class="p">][</span><span class="s2">&quot;Label_url&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">labels3</span><span class="p">[</span><span class="n">ind</span><span class="p">][</span><span class="s2">&quot;Label&quot;</span><span class="p">][</span><span class="s2">&quot;objects&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;instanceURI&quot;</span><span class="p">]</span> 
+        <span class="k">del</span> <span class="n">labels3</span><span class="p">[</span><span class="n">ind</span><span class="p">][</span><span class="s2">&quot;Label&quot;</span><span class="p">]</span>
+
+    <span class="c1"># Remove special info ie emails, tokens (except the Label_url for now)</span>
+    <span class="n">labels3</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;Labeled Data&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># url with token in it</span>
+    <span class="n">labels3</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;View Label&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># url</span>
+    <span class="n">labels3</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;Created By&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># has email address</span>
+    <span class="n">labels3</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;Reviews&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># empty list</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+
+
+<div id="42a55151-876e-4783-a350-6703df9c33e3" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<script type="text/javascript">
+var element = document.getElementById('42a55151-876e-4783-a350-6703df9c33e3');
+google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
+</script>
+</div>
+
+</div>
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+
+
+<div id="42a55151-876e-4783-a350-6703df9c33e3" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<script type="text/javascript">
+var element = document.getElementById('42a55151-876e-4783-a350-6703df9c33e3');
+google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
+</script>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[142]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-python"><pre><span></span><span class="c1"># Download images from URLs</span>
+<span class="kn">import</span> <span class="nn">urllib.request</span>
+
+<span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">labels3</span><span class="p">)):</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">labels3</span><span class="p">[</span><span class="n">ind</span><span class="p">][</span><span class="s2">&quot;External ID&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.jpg&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_label&quot;</span>
+    <span class="n">filepath</span> <span class="o">=</span> <span class="n">get_path_to_save</span><span class="p">(</span><span class="n">save_filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="s2">&quot;png&quot;</span><span class="p">)</span>
+    <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">labels3</span><span class="p">[</span><span class="n">ind</span><span class="p">][</span><span class="s2">&quot;Label_url&quot;</span><span class="p">],</span> <span class="n">filepath</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+
+
+<div id="42a55151-876e-4783-a350-6703df9c33e3" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<script type="text/javascript">
+var element = document.getElementById('42a55151-876e-4783-a350-6703df9c33e3');
+google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
+</script>
+</div>
+
+</div>
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+
+
+<div id="42a55151-876e-4783-a350-6703df9c33e3" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<script type="text/javascript">
+var element = document.getElementById('42a55151-876e-4783-a350-6703df9c33e3');
+google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
+</script>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[155]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-python"><pre><span></span><span class="c1"># Remove Label_url as that URL has the Labelbox token in it</span>
+<span class="n">labelbox_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">labels3</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;External ID&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Label_url&quot;</span><span class="p">])</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+
+
+<div id="42a55151-876e-4783-a350-6703df9c33e3" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<script type="text/javascript">
+var element = document.getElementById('42a55151-876e-4783-a350-6703df9c33e3');
+google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
+</script>
+</div>
+
+</div>
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+
+
+<div id="42a55151-876e-4783-a350-6703df9c33e3" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<script type="text/javascript">
+var element = document.getElementById('42a55151-876e-4783-a350-6703df9c33e3');
+google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
+</script>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[156]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-python"><pre><span></span><span class="n">labelbox_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span> <span class="n">get_path_to_save</span><span class="p">(</span><span class="n">save_filename</span><span class="o">=</span><span class="s2">&quot;labelbox_details&quot;</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="s2">&quot;csv&quot;</span><span class="p">)</span> <span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+
+
+<div id="42a55151-876e-4783-a350-6703df9c33e3" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<script type="text/javascript">
+var element = document.getElementById('42a55151-876e-4783-a350-6703df9c33e3');
+google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
+</script>
+</div>
+
+</div>
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+
+
+<div id="42a55151-876e-4783-a350-6703df9c33e3" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<script type="text/javascript">
+var element = document.getElementById('42a55151-876e-4783-a350-6703df9c33e3');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -14746,9 +15140,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="760f713b-e1a6-4e91-9ed7-276733f1958d" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="42a55151-876e-4783-a350-6703df9c33e3" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('760f713b-e1a6-4e91-9ed7-276733f1958d');
+var element = document.getElementById('42a55151-876e-4783-a350-6703df9c33e3');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -14806,9 +15200,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="760f713b-e1a6-4e91-9ed7-276733f1958d" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="42a55151-876e-4783-a350-6703df9c33e3" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('760f713b-e1a6-4e91-9ed7-276733f1958d');
+var element = document.getElementById('42a55151-876e-4783-a350-6703df9c33e3');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -14876,9 +15270,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="760f713b-e1a6-4e91-9ed7-276733f1958d" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="42a55151-876e-4783-a350-6703df9c33e3" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('760f713b-e1a6-4e91-9ed7-276733f1958d');
+var element = document.getElementById('42a55151-876e-4783-a350-6703df9c33e3');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -14948,9 +15342,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="760f713b-e1a6-4e91-9ed7-276733f1958d" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="42a55151-876e-4783-a350-6703df9c33e3" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('760f713b-e1a6-4e91-9ed7-276733f1958d');
+var element = document.getElementById('42a55151-876e-4783-a350-6703df9c33e3');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -14997,9 +15391,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="760f713b-e1a6-4e91-9ed7-276733f1958d" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="42a55151-876e-4783-a350-6703df9c33e3" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('760f713b-e1a6-4e91-9ed7-276733f1958d');
+var element = document.getElementById('42a55151-876e-4783-a350-6703df9c33e3');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -15043,9 +15437,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="760f713b-e1a6-4e91-9ed7-276733f1958d" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="42a55151-876e-4783-a350-6703df9c33e3" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('760f713b-e1a6-4e91-9ed7-276733f1958d');
+var element = document.getElementById('42a55151-876e-4783-a350-6703df9c33e3');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -15505,9 +15899,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="760f713b-e1a6-4e91-9ed7-276733f1958d" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="42a55151-876e-4783-a350-6703df9c33e3" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('760f713b-e1a6-4e91-9ed7-276733f1958d');
+var element = document.getElementById('42a55151-876e-4783-a350-6703df9c33e3');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -15572,9 +15966,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="760f713b-e1a6-4e91-9ed7-276733f1958d" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="42a55151-876e-4783-a350-6703df9c33e3" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('760f713b-e1a6-4e91-9ed7-276733f1958d');
+var element = document.getElementById('42a55151-876e-4783-a350-6703df9c33e3');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
