@@ -4,5 +4,5 @@
 # chmod 755 src/scripts/save_ipynb.sh
 # to run
 # ./src/scripts/save_ipynb.sh
-jupyter nbconvert --to html src/notebooks/*.ipynb
-jupyter nbconvert --to python src/notebooks/*.ipynb
+jupyter nbconvert --to html src/notebooks/**/*.ipynb
+jupyter nbconvert --to python src/notebooks/**/*.ipynb

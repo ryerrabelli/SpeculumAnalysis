@@ -14269,7 +14269,7 @@ a.anchor-link {
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[1]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-python"><pre><span></span><span class="c1"># Don&#39;t forget to restart runtime after installing</span>
@@ -14333,7 +14333,7 @@ Successfully installed plotly-5.7.0
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[2]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[1]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-python"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
@@ -14375,21 +14375,8 @@ Successfully installed plotly-5.7.0
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>3.7.13 (default, Apr 24 2022, 01:04:09) 
-[GCC 7.5.0]
-</pre>
-</div>
-</div>
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
-<pre>/usr/local/lib/python3.7/dist-packages/statsmodels/tools/_testing.py:19: FutureWarning: pandas.util.testing is deprecated. Use the functions in the public API at pandas.testing instead.
-  import pandas.util.testing as tm
+<pre>3.9.16 (main, Dec  7 2022, 01:11:51) 
+[GCC 9.4.0]
 </pre>
 </div>
 </div>
@@ -14401,10 +14388,14 @@ Successfully installed plotly-5.7.0
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[2]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-python"><pre><span></span><span class="n">notebook_filename</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;http://172.28.0.2:9000/api/sessions&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+<div class=" highlight hl-python"><pre><span></span><span class="n">colab_ip</span> <span class="o">=</span> <span class="o">%</span><span class="n">system</span> <span class="n">hostname</span> <span class="o">-</span><span class="n">I</span>   <span class="c1"># uses colab magic to get list from bash</span>
+<span class="n">colab_ip</span> <span class="o">=</span> <span class="n">colab_ip</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>   <span class="c1"># returns &quot;172.28.0.12&quot;</span>
+<span class="n">colab_port</span> <span class="o">=</span> <span class="mi">9000</span>                <span class="c1"># could use 6000, 8080, or 9000</span>
+
+<span class="n">notebook_filename</span> <span class="o">=</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;http://</span><span class="si">{</span><span class="n">colab_ip</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">colab_port</span><span class="si">}</span><span class="s2">/api/sessions&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
 
 <span class="c1"># Avoids scroll-in-the-scroll in the entire Notebook</span>
 <span class="k">def</span> <span class="nf">resize_colab_cell</span><span class="p">():</span>
@@ -14471,7 +14462,7 @@ Successfully installed plotly-5.7.0
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[3]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-python"><pre><span></span><span class="c1">#@title ## Mount google drive and import my code</span>
@@ -14501,6 +14492,23 @@ Successfully installed plotly-5.7.0
     <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 
 
+
+
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<script type="text/javascript">
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
+google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
+</script>
+</div>
+
+</div>
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
 <pre>[Errno 2] No such file or directory: &#39;/content/drive/MyDrive/PythonProjects/SpeculumAnalysis&#39;
 /content
@@ -14515,7 +14523,7 @@ Successfully installed plotly-5.7.0
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[9]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-python"><pre><span></span><span class="k">try</span><span class="p">:</span>
@@ -14553,6 +14561,23 @@ Successfully installed plotly-5.7.0
     <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 
 
+
+
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<script type="text/javascript">
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
+google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
+</script>
+</div>
+
+</div>
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
 <pre>/root
 Mounted at /content/drive
@@ -14570,10 +14595,10 @@ Mounted at /content/drive
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h1 id="Skip-ahead-from-loaded-code">Skip ahead from loaded code<a class="anchor-link" href="#Skip-ahead-from-loaded-code">&#182;</a></h1>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[10]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-python"><pre><span></span><span class="n">speculum_df_raw</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="s2">&quot;data/02_intermediate/speculum_df_raw&quot;</span><span class="o">+</span><span class="s2">&quot;.pkl&quot;</span><span class="p">)</span>
@@ -14598,6 +14623,32 @@ Mounted at /content/drive
 </div>
 </div>
 
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+
+
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<script type="text/javascript">
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
+google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
+</script>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
@@ -14611,7 +14662,7 @@ Mounted at /content/drive
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-python"><pre><span></span><span class="n">category_orders</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Size&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">,</span><span class="s2">&quot;Unspecified&quot;</span><span class="p">,</span><span class="s2">&quot;None&quot;</span><span class="p">],</span>
@@ -14658,7 +14709,7 @@ Mounted at /content/drive
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-python"><pre><span></span><span class="n">default_plotly_save_scale</span> <span class="o">=</span> <span class="mi">4</span>
@@ -15153,9 +15204,9 @@ Mounted at /content/drive
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -15713,9 +15764,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -16067,9 +16118,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -16148,9 +16199,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -16222,9 +16273,9 @@ Successfully installed reliability-stability-calc-0.0.4
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -16345,9 +16396,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -16549,9 +16600,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -16683,9 +16734,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -16942,9 +16993,9 @@ To view examples of installing some common dependencies, click the
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -16959,9 +17010,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -16976,9 +17027,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -17049,9 +17100,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -17066,9 +17117,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -17083,9 +17134,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -17538,9 +17589,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -17555,9 +17606,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -17572,9 +17623,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -17859,9 +17910,9 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -17876,9 +17927,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -17893,9 +17944,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -18177,9 +18228,9 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -18194,9 +18245,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -18211,9 +18262,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -18430,7 +18481,7 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[36]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-python"><pre><span></span><span class="nb">str</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
@@ -18449,7 +18500,7 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[36]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[&nbsp;]:</div>
 
 
 
@@ -18467,7 +18518,7 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[60]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-python"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">ols_result</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">df_sampled</span><span class="p">))</span>
@@ -18495,7 +18546,7 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[60]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[&nbsp;]:</div>
 
 
 
@@ -18529,7 +18580,7 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[53]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-python"><pre><span></span><span class="n">ols_result</span><span class="o">.</span><span class="n">params</span>
@@ -18548,7 +18599,7 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[53]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[&nbsp;]:</div>
 
 
 
@@ -18570,7 +18621,7 @@ dtype: float64</pre>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[79]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-python"><pre><span></span><span class="n">criteria</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;mmHg&quot;</span><span class="p">:[</span><span class="mi">40</span><span class="p">,</span><span class="mi">80</span><span class="p">,</span><span class="mi">120</span><span class="p">,</span><span class="mi">160</span><span class="p">,</span><span class="mi">200</span><span class="p">],</span> <span class="s2">&quot;Material&quot;</span><span class="p">:[</span><span class="s2">&quot;Nitrile&quot;</span><span class="p">]}</span>
@@ -18671,7 +18722,7 @@ if (outputEl) {{
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[82]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-python"><pre><span></span><span class="n">df_sampled</span>
@@ -18690,7 +18741,7 @@ if (outputEl) {{
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[82]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[&nbsp;]:</div>
 
 
 
@@ -19119,9 +19170,9 @@ if (outputEl) {{
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -19136,9 +19187,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -19414,9 +19465,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -19431,9 +19482,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -19514,9 +19565,9 @@ Name: Material Type, Length: 181, dtype: object</pre>
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -19531,9 +19582,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -19628,9 +19679,9 @@ Warnings:
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -19645,9 +19696,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -20089,9 +20140,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -20106,9 +20157,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -20123,9 +20174,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -20187,9 +20238,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -20204,9 +20255,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="7107bb4c-7b1b-48e0-b607-e0c1fbbb215b" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="c52eadbc-5703-4216-bbe5-b76eb7302ba9" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('7107bb4c-7b1b-48e0-b607-e0c1fbbb215b');
+var element = document.getElementById('c52eadbc-5703-4216-bbe5-b76eb7302ba9');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>

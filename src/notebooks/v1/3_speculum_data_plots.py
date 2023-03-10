@@ -5,7 +5,7 @@
 
 # ## Pip install
 
-# In[3]:
+# In[ ]:
 
 
 # Don't forget to restart runtime after installing
@@ -21,7 +21,7 @@ get_ipython().run_line_magic('pip', 'install plotly==5.7.0.    # need 5.7.0, not
 # ## Base imports
 # 
 
-# In[4]:
+# In[ ]:
 
 
 import os
@@ -52,11 +52,15 @@ import plotly
 import plotly.express as px
 
 
-# In[5]:
+# In[ ]:
 
 
 
-notebook_filename = requests.get("http://172.28.0.2:9000/api/sessions").json()[0]["name"]
+colab_ip = get_ipython().run_line_magic('system', 'hostname -I   # uses colab magic to get list from bash')
+colab_ip = colab_ip[0].strip()   # returns "172.28.0.12"
+colab_port = 9000                # could use 6000, 8080, or 9000
+
+notebook_filename = filename = requests.get(f"http://{colab_ip}:{colab_port}/api/sessions").json()[0]["name"]
 
 # Avoids scroll-in-the-scroll in the entire Notebook
 def resize_colab_cell():
@@ -116,7 +120,7 @@ def get_path_to_save(plot_props:dict=None, file_prefix="", save_filename:str=Non
     #plt.savefig(os.path.join(save_path, save_filename+"."+extension))
 
 
-# In[6]:
+# In[ ]:
 
 
 #@title ## Mount google drive and import my code
@@ -130,7 +134,7 @@ project_path_full = os.path.join("/content/",mountpoint_folder_name,
 get_ipython().run_line_magic('cd', '{project_path_full}')
 
 
-# In[6]:
+# In[ ]:
 
 
 
@@ -155,7 +159,7 @@ except ModuleNotFoundError:  # in case not run in Google colab
 
 # # Skip ahead from loaded code
 
-# In[7]:
+# In[ ]:
 
 
 speculum_df_raw = pd.read_pickle("data/02_intermediate/speculum_df_raw"+".pkl")
@@ -179,7 +183,7 @@ df_multiindex = pd.read_pickle("data/03_processed/combined_df_multiindex"+".pkl"
 
 # ## Setup dicts and helper functions
 
-# In[8]:
+# In[ ]:
 
 
 category_orders={"Size": ["S", "M", "L","Unspecified","None"],
@@ -215,7 +219,7 @@ def filter_by_criteria(criteria:dict, starting_df:pd.DataFrame) -> pd.DataFrame:
 
 # ## Setup  plotly
 
-# In[9]:
+# In[ ]:
 
 
 default_plotly_save_scale = 4
@@ -257,7 +261,7 @@ def save_plotly_figure(fig, file_name:str, animated=False, scale=None, save_in_s
 
 # ##### Define image plotting function
 
-# In[18]:
+# In[ ]:
 
 
 def plot_combined_images(order_current, label_dict, df_long=df_long, nrows=2, ncols=3, do_save=True, do_print=False, dpi=None, annotate_extra_info=True):
@@ -376,13 +380,13 @@ def plot_combined_images(order_current, label_dict, df_long=df_long, nrows=2, nc
 
 # ##### Plot the images
 
-# In[13]:
+# In[ ]:
 
 
 get_ipython().run_line_magic('pip', 'install "labelbox[data]" --quiet')
 
 
-# In[14]:
+# In[ ]:
 
 
 import labelbox
@@ -418,7 +422,7 @@ colors = {
 }
 
 
-# In[15]:
+# In[ ]:
 
 
 image_labels = project.label_generator()
@@ -456,7 +460,7 @@ label_dict = {label.data.external_id: label for label in image_labels}
 #    plot_combined_images(order_current=order_current, label_dict=label_from_id_dict, do_print=True, dpi=150)
 
 
-# In[20]:
+# In[ ]:
 
 
 order_current = 1
@@ -643,7 +647,7 @@ with PIL.Image.open(f'data/01_raw/photos/glove/{filename}') as image_orig:
 
 # #### Plotting trial images - subplots
 
-# In[14]:
+# In[ ]:
 
 
 # figure size in px
@@ -839,7 +843,7 @@ for order_current in range(1,df_long["Order"].max()+1):
     plot_combined_images_plotly(order_current=order_current, save_extensions=["html","jpg","pdf"], n=10 )
 
 
-# In[18]:
+# In[ ]:
 
 
 plot_combined_images_plotly(order_current=1, save_extensions=["jpg"], n=5, annotate_extra_info=False)

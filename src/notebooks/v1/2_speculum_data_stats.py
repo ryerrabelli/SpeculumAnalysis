@@ -5,7 +5,7 @@
 
 # ## Pip install
 
-# In[1]:
+# In[ ]:
 
 
 # Don't forget to restart runtime after installing
@@ -20,7 +20,7 @@ get_ipython().run_line_magic('pip', 'install plotly==5.7.0.    # need 5.7.0, not
 # ## Base imports
 # 
 
-# In[2]:
+# In[1]:
 
 
 import os
@@ -45,11 +45,14 @@ import plotly
 import plotly.express as px
 
 
-# In[ ]:
+# In[2]:
 
 
+colab_ip = get_ipython().run_line_magic('system', 'hostname -I   # uses colab magic to get list from bash')
+colab_ip = colab_ip[0].strip()   # returns "172.28.0.12"
+colab_port = 9000                # could use 6000, 8080, or 9000
 
-notebook_filename = requests.get("http://172.28.0.2:9000/api/sessions").json()[0]["name"]
+notebook_filename = filename = requests.get(f"http://{colab_ip}:{colab_port}/api/sessions").json()[0]["name"]
 
 # Avoids scroll-in-the-scroll in the entire Notebook
 def resize_colab_cell():
@@ -108,7 +111,7 @@ def get_path_to_save(plot_props:dict=None, file_prefix="", save_filename:str=Non
     #plt.savefig(os.path.join(save_path, save_filename+"."+extension))
 
 
-# In[5]:
+# In[3]:
 
 
 #@title ## Mount google drive and import my code
@@ -122,7 +125,7 @@ project_path_full = os.path.join("/content/",mountpoint_folder_name,
 get_ipython().run_line_magic('cd', '{project_path_full}')
 
 
-# In[9]:
+# In[4]:
 
 
 
@@ -147,7 +150,7 @@ except ModuleNotFoundError:  # in case not run in Google colab
 
 # # Skip ahead from loaded code
 
-# In[10]:
+# In[5]:
 
 
 speculum_df_raw = pd.read_pickle("data/02_intermediate/speculum_df_raw"+".pkl")
@@ -171,7 +174,7 @@ df_multiindex = pd.read_pickle("data/03_processed/combined_df_multiindex"+".pkl"
 
 # ## Setup dicts and helper functions
 
-# In[6]:
+# In[ ]:
 
 
 category_orders={"Size": ["S", "M", "L","Unspecified","None"],
@@ -207,7 +210,7 @@ def filter_by_criteria(criteria:dict, starting_df:pd.DataFrame) -> pd.DataFrame:
 
 # ## Setup  plotly
 
-# In[7]:
+# In[ ]:
 
 
 default_plotly_save_scale = 4
@@ -617,13 +620,13 @@ display(anova_tables)
 
 # ## Models
 
-# In[36]:
+# In[ ]:
 
 
 str(None)
 
 
-# In[60]:
+# In[ ]:
 
 
 type(ols_result.predict(df_sampled))
@@ -638,13 +641,13 @@ fig = px.scatter(df, x="sepal_width", y="sepal_length", color="species",
 fig.show()
 
 
-# In[53]:
+# In[ ]:
 
 
 ols_result.params
 
 
-# In[79]:
+# In[ ]:
 
 
 criteria = {"mmHg":[40,80,120,160,200], "Material":["Nitrile"]}
@@ -685,7 +688,7 @@ fig.update_yaxes(tickformat=".0%", tickwidth=2,  nticks=21, ticklabelstep=4,
 fig.show()
 
 
-# In[82]:
+# In[ ]:
 
 
 df_sampled
