@@ -10,8 +10,9 @@
 # available to everyone, while still preventing it from easily being accessed
 # by web scrapers for spam email.
 
-SAVETOFILENAME="email-address-image.png"
-SAVETOFILEPATH="docs/$SAVETOFILENAME"
+# SAVETOFILEPATH can be passed in; otherwise, default value will be used
+# https://linuxhandbook.com/bash-arguments/
+SAVETOFILEPATH=${1:-"docs/email-address-image.png"}
 
 IMAGETEXT="Rahul Sai Yerrabelli: \n  - ryerrab1@alumni.jh.edu \n  - rsy2@illinois.edu"
 

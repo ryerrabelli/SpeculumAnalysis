@@ -1,2 +1,125 @@
+# Rahul Yerrabelli
+# December 2021
+# References:
+# https://docs.github.com/en/get-started/getting-started-with-git/configuring-git-to-handle-line-endings
+# https://github.com/swisnl/gists/blob/master/gitattributes/.gitattributes
+# https://github.com/alexkaratarakis/gitattributes
+
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Ignore files (like .npmignore or .gitignore)
+*.*ignore         text
+
+
+# Declare files that will always have LF line endings on checkout.
+*.pxd    text eol=lf diff=python
+*.py     text eol=lf diff=python
+*.ipynb  text
+*.py3    text eol=lf diff=python
+*.pyw    text eol=lf diff=python
+*.pyx    text eol=lf diff=python
+*.pyz    text eol=lf diff=python
+*.pyi    text eol=lf diff=python
+*.tex     text eol=lf diff=tex
+*.csv     text eol=lf
+*.tab     text eol=lf
+*.tsv     text eol=lf
+*.css     text eol=lf diff=css
+*.scss    text eol=lf diff=css
+*.htm     text eol=lf  diff=html
+*.html    text eol=lf  diff=html
+*.xml     text eol=lf
+*.xhtml   text eol=lf diff=html
+*.dist    text eol=lf
+*.feature text eol=lf
+*.js      text eol=lf
+*.json    text eol=lf
+*.lock    text eol=lf
+*.map     text eol=lf
+*.md      text eol=lf  diff=markdown
+*.mdx     text eol=lf  diff=markdown
+*.php     text eol=lf  diff=php
+*.po      text eol=lf
+*.script  text eol=lf
+*.sql     text eol=lf
+*.twig    text eol=lf
+*.txt     text eol=lf
+*.xsd     text eol=lf
+*.yml     text eol=lf
+*.nb      text diff=mathematica
+*.wls     text diff=mathematica
+*.wl      text diff=mathematica
+# Warning .m is used by both matlab and mathematica
+*.m       text diff=matlab
+
+# Documents
+*.bibtex   text diff=bibtex
+*.doc      diff=astextplain
+*.DOC      diff=astextplain
+*.docx     diff=astextplain
+*.DOCX     diff=astextplain
+*.dot      diff=astextplain
+*.DOT      diff=astextplain
+*.pdf     binary
+*.PDF     binary
+#*.pdf      diff=astextplain
+#*.PDF      diff=astextplain
+*.rtf      diff=astextplain
+*.RTF      diff=astextplain
+
+# Force bash scripts to always use LF line endings so that if a repo is accessed
+# in Unix via a file share from Windows, the scripts will work.
+*.bash     text eol=lf
+*.fish     text eol=lf
+*.sh       text eol=lf
+*.zsh      text eol=lf
+
+# Force batch scripts to always use CRLF line endings so that if a repo is accessed
+# in Windows via a file share from Linux, the scripts will work.
+#*.{cmd,[cC][mM][dD]} text eol=crlf
+#*.{bat,[bB][aA][tT]} text eol=crlf
+*.cmd     text eol=crlf
+*.bat     text eol=crlf
+# powershell
+*.ps1      text eol=crlf
+*.ps1x     text eol=crlf
+*.psm1     text eol=crlf
+*.psd1     text eol=crlf
+*.ps1xml   text eol=crlf
+*.pssc     text eol=crlf
+*.psrc     text eol=crlf
+*.cdxml    text eol=crlf
+
+# Denote all files that are truly binary and should not be modified.
+# (binary is a macro for -text -diff)
+*.{png,jpg,jpeg,gif,webp,woff,woff2} binary
+*.sdf binary
+*.tif binary
+*.tiff binary
+*.eps      binary
+# .svg can be treated as binary or text
+*.svg text eol=lf
+*.fig           binary
+# Archives
+*.7z       binary
+*.gz       binary
+*.jar      binary
+*.tar      binary
+*.tgz      binary
+*.zip      binary
+# Note: .db, .p, and .pkl files are associated
+# with the python modules ``pickle``, ``dbm.*``,
+# ``shelve``, ``marshal``, ``anydbm``, & ``bsddb``
+# (among others).
+*.db     binary
+*.p      binary
+*.pkl    binary
+*.pickle binary
+*.pyc    binary export-ignore
+*.pyo    binary export-ignore
+*.pyd    binary
+
+# Executables
+*.exe             binary
+*.pyc             binary
