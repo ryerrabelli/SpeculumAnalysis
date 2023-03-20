@@ -14261,26 +14261,18 @@ a.anchor-link {
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h1 id="Setup">Setup<a class="anchor-link" href="#Setup">&#182;</a></h1>
 </div>
-</div>
-<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="Pip-install">Pip install<a class="anchor-link" href="#Pip-install">&#182;</a></h2>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[1]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[2]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-python"><pre><span></span><span class="c1"># Don&#39;t forget to restart runtime after installing</span>
-
+<div class=" highlight hl-python"><pre><span></span><span class="c1">#@title ## `pip install`</span>
+<span class="c1"># Don&#39;t forget to restart runtime after installing</span>
 <span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="s2">&quot;labelbox[data]&quot;</span> <span class="o">--</span><span class="n">quiet</span>  <span class="c1"># installs all required libraries plus extras required in manipulating annotations (shapely, geojson, numpy, PILLOW, opencv-python, etc.)</span>
-<span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">U</span> <span class="n">kaleido</span>  <span class="o">--</span><span class="n">quiet</span> <span class="c1"># for saving the still figures</span>
-<span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="n">poppler</span><span class="o">-</span><span class="n">utils</span>   <span class="c1"># for exporting to .eps extension</span>
-<span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="n">plotly</span><span class="o">==</span><span class="mf">5.7</span><span class="o">.</span><span class="mf">0.</span>    <span class="c1"># need 5.7.0, not 5.5, so I can use ticklabelstep argument</span>
-
-<span class="c1"># %pip freeze</span>
-<span class="c1"># %pip freeze | grep matplotlib  # get version</span>
+<span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">U</span> <span class="n">kaleido</span>  <span class="o">--</span><span class="n">quiet</span> <span class="c1"># for saving the still figures besides .eps (i.e png, pdf)</span>
+<span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="n">poppler</span><span class="o">-</span><span class="n">utils</span>  <span class="o">--</span><span class="n">quiet</span>   <span class="c1"># for exporting to .eps extension</span>
+<span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="n">plotly</span><span class="o">&gt;=</span><span class="mf">5.13</span><span class="o">.</span><span class="mi">0</span>    <span class="c1"># need ≥5.6 to use ticklabelstep argument, ≥5.8 to use minor ticks. Release history here https://github.com/plotly/plotly.py/releases</span>
 </pre></div>
 
      </div>
@@ -14288,63 +14280,16 @@ a.anchor-link {
 </div>
 </div>
 
-<div class="jp-Cell-outputWrapper">
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>     <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">189.2/189.2 KB</span> <span class="ansi-red-fg">2.9 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
-     <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">7.8/7.8 MB</span> <span class="ansi-red-fg">15.2 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
-  Preparing metadata (setup.py) ... done
-  Building wheel for pygeotile (setup.py) ... done
-     <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">79.9/79.9 MB</span> <span class="ansi-red-fg">8.2 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
-Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/
-Collecting poppler-utils
-  Downloading poppler_utils-0.1.0-py3-none-any.whl (9.2 kB)
-Requirement already satisfied: Click&gt;=7.0 in /usr/local/lib/python3.8/dist-packages (from poppler-utils) (7.1.2)
-Installing collected packages: poppler-utils
-Successfully installed poppler-utils-0.1.0
-Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/
-Collecting plotly==5.7.0.
-  Downloading plotly-5.7.0-py2.py3-none-any.whl (28.8 MB)
-     <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">28.8/28.8 MB</span> <span class="ansi-red-fg">44.1 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
-Requirement already satisfied: six in /usr/local/lib/python3.8/dist-packages (from plotly==5.7.0.) (1.15.0)
-Requirement already satisfied: tenacity&gt;=6.2.0 in /usr/local/lib/python3.8/dist-packages (from plotly==5.7.0.) (8.2.1)
-Installing collected packages: plotly
-  Attempting uninstall: plotly
-    Found existing installation: plotly 5.5.0
-    Uninstalling plotly-5.5.0:
-      Successfully uninstalled plotly-5.5.0
-Successfully installed plotly-5.7.0
-</pre>
-</div>
-</div>
-
-</div>
-
-</div>
-
-</div>
-<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="Base-imports">Base imports<a class="anchor-link" href="#Base-imports">&#182;</a></h2>
-</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[3]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-python"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<div class=" highlight hl-python"><pre><span></span><span class="c1">#@title ## Base imports</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">cmd</span>
 <span class="kn">import</span> <span class="nn">sys</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -14355,19 +14300,30 @@ Successfully installed plotly-5.7.0
 
 <span class="kn">import</span> <span class="nn">skimage</span>
 <span class="kn">import</span> <span class="nn">skimage.io</span>
-<span class="c1">#from PIL import Image</span>
 <span class="kn">import</span> <span class="nn">PIL</span>
 <span class="kn">import</span> <span class="nn">PIL.Image</span>
 <span class="kn">import</span> <span class="nn">requests</span>
 
 <span class="kn">import</span> <span class="nn">labelbox</span>
-<span class="c1">#from labelbox.data.annotation_types import Geometry</span>
 
 <span class="kn">import</span> <span class="nn">IPython.display</span>
 <span class="kn">import</span> <span class="nn">matplotlib</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">plotly</span>
 <span class="kn">import</span> <span class="nn">plotly.express</span> <span class="k">as</span> <span class="nn">px</span>
+<span class="kn">import</span> <span class="nn">plotly.graph_objects</span> <span class="k">as</span> <span class="nn">go</span>
+<span class="kn">import</span> <span class="nn">plotly.subplots</span>
+
+<span class="c1"># Display versions of python packages</span>
+<span class="n">pip_versions</span> <span class="o">=</span> <span class="o">%</span><span class="n">system</span> <span class="n">pip</span> <span class="n">freeze</span>  <span class="c1"># uses colab magic to get list from shell</span>
+<span class="n">pip_versions_organized</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;standard&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">pip_version</span> <span class="k">for</span> <span class="n">pip_version</span> <span class="ow">in</span> <span class="n">pip_versions</span> <span class="k">if</span> <span class="s2">&quot;==&quot;</span> <span class="ow">in</span> <span class="n">pip_version</span><span class="p">],</span>
+    <span class="s2">&quot;other&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">pip_version</span> <span class="k">for</span> <span class="n">pip_version</span> <span class="ow">in</span> <span class="n">pip_versions</span> <span class="k">if</span> <span class="s2">&quot;==&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pip_version</span><span class="p">]</span>
+    <span class="p">}</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Python version: </span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># display version of python itself (i.e. 3.8.10)</span>
+<span class="n">cli</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">Cmd</span><span class="p">()</span>
+<span class="n">cli</span><span class="o">.</span><span class="n">columnize</span><span class="p">(</span><span class="n">pip_versions_organized</span><span class="p">[</span><span class="s2">&quot;standard&quot;</span><span class="p">],</span> <span class="n">displaywidth</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>
+<span class="n">cli</span><span class="o">.</span><span class="n">columnize</span><span class="p">(</span><span class="n">pip_versions_organized</span><span class="p">[</span><span class="s2">&quot;other&quot;</span><span class="p">],</span> <span class="n">displaywidth</span><span class="o">=</span><span class="mi">160</span><span class="p">)</span>
 </pre></div>
 
      </div>
@@ -14387,8 +14343,29 @@ Successfully installed plotly-5.7.0
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>3.7.13 (default, Apr 24 2022, 01:04:09) 
-[GCC 7.5.0]
+<pre>Python version: 3.9.16 (main, Dec  7 2022, 01:11:51) 
+[GCC 9.4.0] 
+
+absl-py==1.4.0                backcall==0.2.0         charset-normalizer==2.0.12  cvxopt==1.3.0           dm-tree==0.1.8            fastdownload==0.0.7        GDAL==3.3.2                       google-cloud-bigquery==3.4.2           greenlet==2.0.2           htmlmin==0.1.12              imutils==0.5.4           jupyter-client==6.1.12        libclang==15.0.6.1          mistune==0.8.4           nbclient==0.7.2                  opencv-python==4.6.0.66           parso==0.8.3         pluggy==0.7.1              psutil==5.9.4              pydot-ng==2.0.0     PySocks==1.7.1                      qdldl==0.1.5.post3              Send2Trash==1.8.0        sphinxcontrib-applehelp==1.0.4        tblib==1.7.0                          terminado==0.17.1     traitlets==5.7.1          Werkzeug==2.2.3          
+alabaster==0.7.13             backoff==1.10.0         click==8.1.3                cvxpy==1.3.0            docutils==0.16            fastjsonschema==2.16.3     gdown==4.6.4                      google-cloud-bigquery-storage==2.19.0  grpcio==1.51.3            httpimport==1.3.0            inflect==6.0.2           jupyter-console==6.1.0        librosa==0.10.0             mizani==0.8.1            nbconvert==6.5.4                 opencv-python-headless==4.7.0.72  partd==1.3.0         pooch==1.7.0               psycopg2==2.9.5            pydotplus==2.0.2    pytensor==2.10.1                    qudida==0.0.4                   shapely==2.0.1           sphinxcontrib-devhelp==1.0.2          tenacity==8.2.2                       text-unidecode==1.3   tweepy==4.13.0            widgetsnbextension==3.6.2
+albumentations==1.2.1         beautifulsoup4==4.11.2  cloudpickle==2.2.1          cycler==0.11.0          dopamine-rl==1.0.5        fastprogress==1.0.3        gensim==3.6.0                     google-cloud-core==2.3.2               grpcio-status==1.48.2     httplib2==0.21.0             intel-openmp==2023.0.0   jupyter_core==5.2.0           lightgbm==3.3.5             mkl==2019.0              nbformat==5.7.3                  openpyxl==3.0.10                  pathlib==1.0.1       poppler-utils==0.1.0       ptyprocess==0.7.0          PyDrive==1.3.1      pytest==3.6.4                       regex==2022.10.31               six==1.15.0              sphinxcontrib-htmlhelp==2.0.1         tensorboard==2.11.2                   textblob==0.17.1      typeguard==3.0.1          wordcloud==1.8.2.2       
+altair==4.2.2                 bleach==6.0.0           cmake==3.25.2               cymem==2.0.7            earthengine-api==0.1.345  fastrlock==0.8.1           geographiclib==1.52               google-cloud-datastore==2.11.1         gspread==3.4.2            humanize==4.6.0              ipykernel==5.3.4         jupyterlab-pygments==0.2.2    llvmlite==0.39.1            mlxtend==0.14.0          ndjson==0.3.1                    opt-einsum==3.3.0                 pathy==0.10.1        portpicker==1.3.9          py==1.11.0                 pyerfa==2.0.0.1     python-apt==0.0.0                   requests==2.27.1                sklearn-pandas==2.2.0    sphinxcontrib-jsmath==1.0.1           tensorboard-data-server==0.6.1        thinc==8.1.9          typer==0.7.0              wrapt==1.15.0            
+argon2-cffi==21.3.0           blis==0.7.9             cmdstanpy==1.1.0            Cython==0.29.33         easydict==1.10            filelock==3.10.0           geojson==3.0.1                    google-cloud-firestore==2.7.3          gspread-dataframe==3.0.8  hyperopt==0.2.7              ipython==7.9.0           jupyterlab-widgets==3.0.5     locket==1.0.0               more-itertools==9.1.0    networkx==3.0                    osqp==0.6.2.post0                 patsy==0.5.3         prefetch-generator==1.0.3  py4j==0.10.9.7             pyGeoTile==1.0.6    python-dateutil==2.8.2              requests-oauthlib==1.3.1        smart-open==6.3.0        sphinxcontrib-qthelp==1.0.3           tensorboard-plugin-wit==1.8.1         threadpoolctl==3.1.0  typing_extensions==4.5.0  xarray==2022.12.0        
+argon2-cffi-bindings==21.2.0  bokeh==2.4.3            colorcet==3.0.1             dask==2022.12.1         ecos==2.0.12              firebase-admin==5.3.0      geopy==1.17.0                     google-cloud-language==2.6.1           gym==0.25.2               idna==3.4                    ipython-genutils==0.2.0  kaggle==1.5.13                logical-unification==0.4.5  moviepy==0.2.3.5         nibabel==3.0.2                   packaging==23.0                   pep517==0.13.0       preshed==3.0.8             pyarrow==9.0.0             Pygments==2.6.1     python-louvain==0.16                requests-unixsocket==0.2.0      snowballstemmer==2.2.0   sphinxcontrib-serializinghtml==1.1.5  tensorflow==2.11.0                    tifffile==2023.3.15   tzdata==2022.7            xarray-einstats==0.5.1   
+arviz==0.15.1                 branca==0.6.0           colorlover==0.3.0           datascience==0.17.6     editdistance==0.5.3       fix-yahoo-finance==0.0.22  gin-config==0.5.0                 google-cloud-storage==2.7.0            gym-notices==0.0.8        ImageHash==4.3.1             ipython-sql==0.3.9       kaleido==0.2.1                LunarCalendar==0.0.9        mpmath==1.3.0            nltk==3.8.1                      palettable==3.3.0                 pexpect==4.8.0       prettytable==3.6.0         pyasn1==0.4.8              PyGObject==3.36.0   python-slugify==8.0.1               rpy2==3.5.5                     sortedcontainers==2.4.0  SQLAlchemy==1.4.46                    tensorflow-datasets==4.8.3            tinycss2==1.2.1       tzlocal==4.2              xgboost==1.7.4           
+astropy==5.2.1                bs4==0.0.1              community==1.0.0b1          db-dtypes==1.0.5        entrypoints==0.4          Flask==2.2.3               glob2==0.7                        google-cloud-translate==3.8.4          h5netcdf==1.1.0           imageio==2.9.0               ipywidgets==7.7.1        keras==2.11.0                 lxml==4.9.2                 msgpack==1.0.5           notebook==6.3.0                  pandas==1.4.4                     phik==0.12.3         progressbar2==3.38.0       pyasn1-modules==0.2.8      pymc==5.1.2         python-utils==3.5.2                 rsa==4.9                        soundfile==0.12.1        sqlparse==0.4.3                       tensorflow-estimator==2.11.0          toml==0.10.2          uritemplate==4.1.1        xkit==0.0.0              
+astunparse==1.6.3             CacheControl==0.12.11   confection==0.0.4           dbus-python==1.2.16     ephem==4.1.4              flatbuffers==23.3.3        google==2.0.3                     google-crc32c==1.5.0                   h5py==3.8.0               imagesize==1.4.1             itsdangerous==2.1.2      keras-vis==0.4.1              Markdown==3.4.1             multimethod==1.9.1       numba==0.56.4                    pandas-datareader==0.10.0         pickleshare==0.7.5   prometheus-client==0.16.0  pycocotools==2.0.6         PyMeeus==0.5.12     pytz==2022.7.1                      scikit-image==0.19.3            soupsieve==2.4           srsly==2.4.6                          tensorflow-gcs-config==2.11.0         tomli==2.0.1          urllib3==1.26.15          xlrd==2.0.1              
+atomicwrites==1.4.1           cachetools==5.3.0       cons==0.4.5                 debugpy==1.6.6          et-xmlfile==1.1.0         folium==0.12.1.post1       google-api-core==2.11.0           google-pasta==0.2.0                    HeapDict==1.0.1           imbalanced-learn==0.10.1     jax==0.4.6               kiwisolver==1.4.4             MarkupSafe==2.1.2           multipledispatch==0.6.0  numexpr==2.8.4                   pandas-gbq==0.17.9                Pillow==8.4.0        promise==2.3               pycparser==2.21            pymystem3==0.2.0    pytz-deprecation-shim==0.1.0.post0  scikit-learn==1.2.2             soxr==0.3.4              statsmodels==0.13.5                   tensorflow-hub==0.13.0                toolz==0.12.0         vega-datasets==0.9.0      xlwt==1.3.0              
+attrs==22.2.0                 catalogue==2.0.8        contextlib2==0.6.0.post1    decorator==4.4.2        etils==1.1.0              fonttools==4.39.0          google-api-python-client==2.70.0  google-resumable-media==2.4.1          hijri-converter==2.2.4    imblearn==0.0                jieba==0.42.1            korean-lunar-calendar==0.3.1  matplotlib==3.7.1           multitasking==0.0.11     numpy==1.22.4                    pandas-profiling==3.2.0           pip-tools==6.6.2     prompt-toolkit==2.0.10     pyct==0.5.0                PyOpenGL==3.1.6     pyviz-comms==2.2.1                  scipy==1.10.1                   spacy==3.5.1             sympy==1.11.1                         tensorflow-io-gcs-filesystem==0.31.0  torchsummary==1.5.1   visions==0.7.4            yellowbrick==1.5         
+audioread==3.0.0              certifi==2022.12.7      contourpy==1.0.7            defusedxml==0.7.1       etuples==0.3.8            fsspec==2023.3.0           google-auth==2.16.2               googleapis-common-protos==1.58.0       holidays==0.21.13         imgaug==0.4.0                Jinja2==3.1.2            labelbox==3.41.0              matplotlib-venn==0.11.9     murmurhash==1.0.9        oauth2client==4.1.3              pandocfilters==1.5.0              platformdirs==3.1.1  prophet==1.1.2             pydantic==1.10.6           pyparsing==3.0.9    PyWavelets==1.4.1                   screen-resolution-extra==0.0.0  spacy-legacy==3.0.12     tables==3.7.0                         tensorflow-metadata==1.12.0           torchtext==0.14.1     wasabi==1.1.1             zict==2.2.0              
+autograd==1.5                 cffi==1.15.1            convertdate==2.4.0          distributed==2022.12.1  fastai==2.7.11            future==0.18.3             google-auth-httplib2==0.1.0       googledrivedownloader==0.4             holoviews==1.14.9         importlib-metadata==6.0.0    joblib==1.1.1            langcodes==3.3.0              miniKanren==1.0.3           music21==5.5.0           oauthlib==3.2.2                  panel==0.14.4                     plotly==5.13.0       proto-plus==1.22.2         pydata-google-auth==1.7.0  pyproj==3.4.1       PyYAML==6.0                         scs==3.2.2                      spacy-loggers==1.0.4     tabulate==0.8.10                      tensorflow-probability==0.19.0        tornado==6.2          wcwidth==0.2.6            zipp==3.15.0             
+Babel==2.12.1                 chardet==3.0.4          cufflinks==0.17.3           dlib==19.24.0           fastcore==1.5.28          gast==0.4.0                google-auth-oauthlib==0.4.6       graphviz==0.10.1                       html5lib==1.1             importlib-resources==5.12.0  jsonschema==4.3.3        lazy_loader==0.1              missingno==0.5.2            natsort==5.5.0           opencv-contrib-python==4.6.0.66  param==1.13.0                     plotnine==0.10.1     protobuf==3.19.6           pydot==1.3.0               pyrsistent==0.19.3  pyzmq==23.2.1                       seaborn==0.12.2                 Sphinx==3.5.4            tangled-up-in-unicode==0.2.0          termcolor==2.2.0                      tqdm==4.65.0          webencodings==0.5.1     
+en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.5.0/en_core_web_sm-3.5.0-py3-none-any.whl
+google-colab @ file:///colabtools/dist/google-colab-1.0.0.tar.gz
+jaxlib @ https://storage.googleapis.com/jax-releases/cuda11/jaxlib-0.4.6+cuda11.cudnn86-cp39-cp39-manylinux2014_x86_64.whl
+torch @ https://download.pytorch.org/whl/cu116/torch-1.13.1%2Bcu116-cp39-cp39-linux_x86_64.whl
+torchaudio @ https://download.pytorch.org/whl/cu116/torchaudio-0.13.1%2Bcu116-cp39-cp39-linux_x86_64.whl
+torchvision @ https://download.pytorch.org/whl/cu116/torchvision-0.14.1%2Bcu116-cp39-cp39-linux_x86_64.whl
 </pre>
 </div>
 </div>
@@ -14403,7 +14380,12 @@ Successfully installed plotly-5.7.0
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-python"><pre><span></span><span class="n">notebook_filename</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;http://172.28.0.2:9000/api/sessions&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+<div class=" highlight hl-python"><pre><span></span><span class="n">colab_ip</span> <span class="o">=</span> <span class="o">%</span><span class="n">system</span> <span class="n">hostname</span> <span class="o">-</span><span class="n">I</span>   <span class="c1"># uses colab magic to get list from bash</span>
+<span class="n">colab_ip</span> <span class="o">=</span> <span class="n">colab_ip</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>   <span class="c1"># returns &quot;172.28.0.12&quot;</span>
+<span class="c1"># Get most possible port names with: !sudo lsof -i -P -n | grep LISTEN</span>
+<span class="n">colab_port</span> <span class="o">=</span> <span class="mi">9000</span>                <span class="c1"># could use 6000, 8080, or 9000</span>
+
+<span class="n">notebook_filename</span> <span class="o">=</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;http://</span><span class="si">{</span><span class="n">colab_ip</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">colab_port</span><span class="si">}</span><span class="s2">/api/sessions&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
 
 <span class="c1"># Avoids scroll-in-the-scroll in the entire Notebook</span>
 <span class="k">def</span> <span class="nf">resize_colab_cell</span><span class="p">():</span>
@@ -14413,9 +14395,7 @@ Successfully installed plotly-5.7.0
 
 <span class="c1">#@markdown ### func `def get_path_to_save(...):`</span>
 <span class="k">def</span> <span class="nf">get_path_to_save</span><span class="p">(</span><span class="n">plot_props</span><span class="p">:</span><span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">save_filename</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_in_subfolder</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="s2">&quot;jpg&quot;</span><span class="p">,</span> <span class="n">dot</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">create_folder_if_necessary</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Code created myself (Rahul Yerrabelli)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Code created myself (Rahul Yerrabelli)&quot;&quot;&quot;</span>
     <span class="n">replace_characters</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;$&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">frac&quot;</span><span class="p">:</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -14459,7 +14439,6 @@ Successfully installed plotly-5.7.0
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span> <span class="ow">and</span> <span class="n">create_folder_if_necessary</span><span class="p">:</span>
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="n">file_prefix</span><span class="o">+</span><span class="n">save_filename</span><span class="o">+</span><span class="n">dot</span><span class="o">+</span><span class="n">extension</span><span class="p">)</span>
-    <span class="c1">#plt.savefig(os.path.join(save_path, save_filename+dot+extension))</span>
 </pre></div>
 
      </div>
@@ -14470,14 +14449,13 @@ Successfully installed plotly-5.7.0
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-python"><pre><span></span><span class="c1">#@title ## Mount google drive and import my code</span>
 
 <span class="n">mountpoint_folder_name</span> <span class="o">=</span> <span class="s2">&quot;drive&quot;</span>  <span class="c1"># can be anything, doesn&#39;t have to be &quot;drive&quot;</span>
 <span class="n">project_path_within_drive</span> <span class="o">=</span> <span class="s2">&quot;PythonProjects/SpeculumAnalysis&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
-<span class="c1">#project_path_within_drive = &quot;UIUC ECs/Rahul_Ashkhan_Projects/SpeculumProjects_Shared/Analysis&quot; #@param {type:&quot;string&quot;}</span>
 <span class="n">project_path_full</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;/content/&quot;</span><span class="p">,</span><span class="n">mountpoint_folder_name</span><span class="p">,</span>
                         <span class="s2">&quot;MyDrive&quot;</span><span class="p">,</span><span class="n">project_path_within_drive</span><span class="p">)</span>
 
@@ -14493,23 +14471,6 @@ Successfully installed plotly-5.7.0
 
 
 <div class="jp-OutputArea jp-Cell-outputArea">
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-
-
-<div id="65198260-7ceb-4e19-8aab-bddaa2457126" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
-<script type="text/javascript">
-var element = document.getElementById('65198260-7ceb-4e19-8aab-bddaa2457126');
-google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
-</script>
-</div>
-
-</div>
 
 <div class="jp-OutputArea-child">
 
@@ -14571,9 +14532,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="65198260-7ceb-4e19-8aab-bddaa2457126" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="eebdb4dc-576b-4175-9a7f-75a0e81adce6" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('65198260-7ceb-4e19-8aab-bddaa2457126');
+var element = document.getElementById('eebdb4dc-576b-4175-9a7f-75a0e81adce6');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -14589,7 +14550,7 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
 <pre>/root
 Mounted at /content/drive
-/content/drive/.shortcut-targets-by-id/1okL5s1HTQUWqKodPSVNP_RsK0o81IH5E/PythonProjects/SpeculumAnalysis
+/content/drive/MyDrive/Computer Backups/Rahul Yerrabelli drive/PythonProjects/SpeculumAnalysis
 </pre>
 </div>
 </div>
@@ -14644,9 +14605,9 @@ Mounted at /content/drive
 
 
 
-<div id="65198260-7ceb-4e19-8aab-bddaa2457126" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="eebdb4dc-576b-4175-9a7f-75a0e81adce6" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('65198260-7ceb-4e19-8aab-bddaa2457126');
+var element = document.getElementById('eebdb4dc-576b-4175-9a7f-75a0e81adce6');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -14720,9 +14681,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="65198260-7ceb-4e19-8aab-bddaa2457126" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="eebdb4dc-576b-4175-9a7f-75a0e81adce6" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('65198260-7ceb-4e19-8aab-bddaa2457126');
+var element = document.getElementById('eebdb4dc-576b-4175-9a7f-75a0e81adce6');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -14775,9 +14736,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="65198260-7ceb-4e19-8aab-bddaa2457126" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="eebdb4dc-576b-4175-9a7f-75a0e81adce6" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('65198260-7ceb-4e19-8aab-bddaa2457126');
+var element = document.getElementById('eebdb4dc-576b-4175-9a7f-75a0e81adce6');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -14925,9 +14886,9 @@ Dropdown classification is deprecated and will be removed in a future release
 
 
 
-<div id="65198260-7ceb-4e19-8aab-bddaa2457126" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="eebdb4dc-576b-4175-9a7f-75a0e81adce6" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('65198260-7ceb-4e19-8aab-bddaa2457126');
+var element = document.getElementById('eebdb4dc-576b-4175-9a7f-75a0e81adce6');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -15001,9 +14962,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="65198260-7ceb-4e19-8aab-bddaa2457126" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="eebdb4dc-576b-4175-9a7f-75a0e81adce6" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('65198260-7ceb-4e19-8aab-bddaa2457126');
+var element = document.getElementById('eebdb4dc-576b-4175-9a7f-75a0e81adce6');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -15121,9 +15082,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="65198260-7ceb-4e19-8aab-bddaa2457126" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="eebdb4dc-576b-4175-9a7f-75a0e81adce6" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('65198260-7ceb-4e19-8aab-bddaa2457126');
+var element = document.getElementById('eebdb4dc-576b-4175-9a7f-75a0e81adce6');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -15166,9 +15127,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="65198260-7ceb-4e19-8aab-bddaa2457126" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="eebdb4dc-576b-4175-9a7f-75a0e81adce6" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('65198260-7ceb-4e19-8aab-bddaa2457126');
+var element = document.getElementById('eebdb4dc-576b-4175-9a7f-75a0e81adce6');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -15646,9 +15607,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="65198260-7ceb-4e19-8aab-bddaa2457126" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="eebdb4dc-576b-4175-9a7f-75a0e81adce6" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('65198260-7ceb-4e19-8aab-bddaa2457126');
+var element = document.getElementById('eebdb4dc-576b-4175-9a7f-75a0e81adce6');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -15686,9 +15647,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="65198260-7ceb-4e19-8aab-bddaa2457126" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="eebdb4dc-576b-4175-9a7f-75a0e81adce6" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('65198260-7ceb-4e19-8aab-bddaa2457126');
+var element = document.getElementById('eebdb4dc-576b-4175-9a7f-75a0e81adce6');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -15726,9 +15687,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="65198260-7ceb-4e19-8aab-bddaa2457126" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="eebdb4dc-576b-4175-9a7f-75a0e81adce6" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('65198260-7ceb-4e19-8aab-bddaa2457126');
+var element = document.getElementById('eebdb4dc-576b-4175-9a7f-75a0e81adce6');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -15813,9 +15774,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="65198260-7ceb-4e19-8aab-bddaa2457126" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="eebdb4dc-576b-4175-9a7f-75a0e81adce6" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('65198260-7ceb-4e19-8aab-bddaa2457126');
+var element = document.getElementById('eebdb4dc-576b-4175-9a7f-75a0e81adce6');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -15918,9 +15879,9 @@ if (outputEl) {{
 
 
 
-<div id="65198260-7ceb-4e19-8aab-bddaa2457126" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="eebdb4dc-576b-4175-9a7f-75a0e81adce6" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('65198260-7ceb-4e19-8aab-bddaa2457126');
+var element = document.getElementById('eebdb4dc-576b-4175-9a7f-75a0e81adce6');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -16039,9 +16000,9 @@ if (outputEl) {{
 
 
 
-<div id="65198260-7ceb-4e19-8aab-bddaa2457126" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="eebdb4dc-576b-4175-9a7f-75a0e81adce6" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('65198260-7ceb-4e19-8aab-bddaa2457126');
+var element = document.getElementById('eebdb4dc-576b-4175-9a7f-75a0e81adce6');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -16167,9 +16128,9 @@ if (outputEl) {{
 
 
 
-<div id="65198260-7ceb-4e19-8aab-bddaa2457126" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="eebdb4dc-576b-4175-9a7f-75a0e81adce6" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('65198260-7ceb-4e19-8aab-bddaa2457126');
+var element = document.getElementById('eebdb4dc-576b-4175-9a7f-75a0e81adce6');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
@@ -16312,9 +16273,9 @@ google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 
 
 
-<div id="65198260-7ceb-4e19-8aab-bddaa2457126" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
+<div id="eebdb4dc-576b-4175-9a7f-75a0e81adce6" class="jp-RenderedJavaScript jp-OutputArea-output " data-mime-type="application/javascript">
 <script type="text/javascript">
-var element = document.getElementById('65198260-7ceb-4e19-8aab-bddaa2457126');
+var element = document.getElementById('eebdb4dc-576b-4175-9a7f-75a0e81adce6');
 google.colab.output.setIframeHeight(0, true, {maxHeight: 10000})
 </script>
 </div>
